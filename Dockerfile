@@ -27,7 +27,7 @@ COPY go.sum .
 RUN go mod download
 
 # Copy the code into the build dir
-COPY ap.go main.go plugin.go zcrypt.go .
+COPY ap.go main.go plugin.go zcrypt.go ./
 
 # Build the application
 RUN CGO_ENABLED=0 GO111MODULE=on go build -o cex-plugin .
