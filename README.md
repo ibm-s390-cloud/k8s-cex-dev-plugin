@@ -13,8 +13,8 @@ Build the plugin golang code and package the binary into a container. Deploy one
 container per Kubernetes node for example as a daemon set in namespace
 `kube-system`. By default, the plugin takes care of all APQNs of crypto cards in
 `ep11` mode. With the command line option `-t <cextype>` or environment variable
-`CEXTYPE`, you can switch the plugin to handle CCA-Coprocessor mode (`cca`) or
-Accelerator mode (`accel`) cards respectively.
+`CEXTYPE`, you can instruct the plugin to handle CCA-Coprocessor mode (`cca`) or
+Accelerator mode (`accel`) or EP11-Coprocessor mode (`ep11`) cards respectively.
 
 The plugin registers at the kubelet instance on the node as a device plugin
 for the resource `ibm.com/cex-ep11` or `ibm.com/cex-cca` or
@@ -90,11 +90,18 @@ this APQN for related crypto operations.
   cards/domains which are available on the node but attempts to use them
   via ioctl() at the `/dev/z90crypt` device node within the container will fail
   for all but the one APQN allowed.
+* As already described above, the sysfs in a container is a simple read-only
+  shadow of the nodes' sysfs. By default applications using the CCA library will
+  use the 'default domain' as configured on the node presented in the sysfs
+  attribute `/sys/bus/ap/ap_domain`. This domain may not fit to the domain of
+  the only APQN accessible within the container. However, the CCA library
+  processes an environment variable `CSU_DEFAULT_DOMAIN` which is set by the
+  plugin as part of the resource allocation during container startup.
 * The plugin is not informed by Kubernetes about the termination of containers
   using limited resources. So there is no way to have some bookkeeping about
   which 'plugin devices' and thus backing APQNs are unused and which ones are
   used. So there is also no way to remove no longer used zcrypt node devices. As
-  it is allowed to shutdown and restart the plugin at any time, there is also no
+  it is allowed to shut down and restart the plugin at any time, there is also no
   way to cleanup the zcrypt node devices with startup or termination.
   This is not a real issue, but users might wonder about the leftover
   `zcrypt_apqn_<adapter>_<domain>` device nodes in the nodes `/dev` directories.

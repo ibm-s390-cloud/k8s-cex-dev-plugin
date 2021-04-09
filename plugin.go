@@ -344,6 +344,7 @@ func (z *ZcryptDevPlugin) Allocate(ctx context.Context, req *k8spapi.AllocateReq
 	rsp := new(k8spapi.AllocateResponse)
 	for _, careq := range req.GetContainerRequests() {
 		//fmt.Printf("debug: Allocate(): Container allocrequest=%v\n", careq)
+		domain := -1
 		carsp := k8spapi.ContainerAllocateResponse{}
 		for _, id := range careq.GetDevicesIDs() {
 			//fmt.Printf("debug: Allocate(): Container request for device ID %v\n", id)
@@ -353,6 +354,7 @@ func (z *ZcryptDevPlugin) Allocate(ctx context.Context, req *k8spapi.AllocateReq
 				log.Printf("plugin: Error parsing device id '%s'\n", id)
 				return nil, errors.New("Error parsing device id")
 			}
+			domain = queue
 			znode := fmt.Sprintf("zcrypt_apqn_%d_%d", card, queue)
 			if !zcryptNodeExists(znode) {
 				//fmt.Printf("debug: creating zcrypt device node '%s'\n", znode)
@@ -372,6 +374,11 @@ func (z *ZcryptDevPlugin) Allocate(ctx context.Context, req *k8spapi.AllocateReq
 			carsp.Devices = append(carsp.Devices, dev)
 			// only one device per container
 			break
+		}
+		if domain >= 0 {
+			carsp.Envs = map[string]string{
+				"CSU_DEFAULT_DOMAIN": fmt.Sprintf("%d", domain),
+			}
 		}
 		rsp.ContainerResponses = append(rsp.ContainerResponses, &carsp)
 	}
