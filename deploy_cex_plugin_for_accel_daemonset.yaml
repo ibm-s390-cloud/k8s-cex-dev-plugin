@@ -1,0 +1,43 @@
+# sample cex plugin stage 1 accel daemonset for deployment
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cex-plugin-daemonset-accel
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      name: cex-plugin-stage-1-accel
+  template:
+    metadata:
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ""
+      labels:
+        name: cex-plugin-stage-1-accel
+    spec:
+      containers:
+      - image: cex-plugin-state-1-image:latest
+        imagePullPolicy: Always
+        name: cex-plugin-stage-1-accel
+        securityContext:
+          privileged: true
+        env:
+          - name: CEXTYPE
+            value: "accel"
+        volumeMounts:
+          - name: device-plugin-grpc
+            mountPath: /var/lib/kubelet/device-plugins
+          - name: dev
+            mountPath: /dev
+          - name: sys
+            mountPath: /sys
+      volumes:
+        - name: device-plugin-grpc
+          hostPath:
+            path: /var/lib/kubelet/device-plugins
+        - name: dev
+          hostPath:
+            path: /dev
+        - name: sys
+          hostPath:
+            path: /sys

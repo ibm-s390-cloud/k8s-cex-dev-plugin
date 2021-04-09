@@ -1,0 +1,43 @@
+# sample cex plugin stage 1 cca daemonset for deployment
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cex-plugin-daemonset-cca
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      name: cex-plugin-stage-1-cca
+  template:
+    metadata:
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ""
+      labels:
+        name: cex-plugin-stage-1-cca
+    spec:
+      containers:
+      - image: cex-plugin-state-1-image:latest
+        imagePullPolicy: Always
+        name: cex-plugin-stage-1-cca
+        securityContext:
+          privileged: true
+        env:
+          - name: CEXTYPE
+            value: "cca"
+        volumeMounts:
+          - name: device-plugin-grpc
+            mountPath: /var/lib/kubelet/device-plugins
+          - name: dev
+            mountPath: /dev
+          - name: sys
+            mountPath: /sys
+      volumes:
+        - name: device-plugin-grpc
+          hostPath:
+            path: /var/lib/kubelet/device-plugins
+        - name: dev
+          hostPath:
+            path: /dev
+        - name: sys
+          hostPath:
+            path: /sys
