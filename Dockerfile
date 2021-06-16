@@ -34,6 +34,9 @@ RUN CGO_ENABLED=0 GO111MODULE=on go build -o cex-plugin .
 # now do the runtime image
 FROM scratch
 
+WORKDIR /licenses
+COPY LICENSE license
+
 WORKDIR /work
 COPY --from=build /build/cex-plugin ./
 
