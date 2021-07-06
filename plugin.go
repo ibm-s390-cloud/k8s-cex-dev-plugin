@@ -33,8 +33,11 @@ import (
 
 const (
 	baseResourceName    = "ibm.com/s390/cex-config" // base resource name
-	apqnOverCommitLimit = 1                        // xxx overcommit limit: 1 is no overcommit
-	apqnsCheckInterval  = 30                       // device health check interval in seconds
+)
+
+var (
+	apqnOverCommitLimit = getenvint("APQN_OVERCOMMIT_LIMIT", 1, 1) // overcommit limit: 1 is no overcommit
+	apqnsCheckInterval  = time.Duration(getenvint("APQN_CHECK_INTERVAL", 30, 10)) // device health check interval in seconds
 )
 
 type ZCryptoDPMLister struct {

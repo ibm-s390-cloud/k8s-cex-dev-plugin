@@ -27,6 +27,8 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -36,10 +38,29 @@ import (
 const (
 	podResSocket                  = "/var/lib/kubelet/pod-resources/kubelet.sock"
 	plConTimeout                  = 10  // connection timeout
-	plPollTime                    = 30  // every plPollTime fetch and process the pod resources
-	DeleteResourceTimeoutIfUnused = 180 // xxx 1800 // delete never used resources after 30min
-	DeleteResourceTimeoutAfterUse = 60  // xxx 120 // delete not any more used resources after 2 min
 )
+
+var (
+	plPollTime                    = time.Duration(getenvint("PODLISTER_POLL_INTERVAL", 30, 10)) // every plPollTime fetch and process the pod resources
+	DeleteResourceTimeoutIfUnused = int64(getenvint("RESOURCE_DELETE_NEVER_USED", 1800, 30)) // delete never used resources after 30min
+	DeleteResourceTimeoutAfterUse = int64(getenvint("RESOURCE_DELETE_UNUSED", 120, 30)) // delete not any more used resources after 2 min	
+)
+
+func getenvint(envvar string, defaultval, minval int) int {
+	valstr, isset := os.LookupEnv(envvar)
+	if isset {
+		valint, err := strconv.Atoi(valstr)
+		if err != nil {
+			log.Printf("Podlister: Invalid setting for %s: %q.  Using default value...\n", envvar, err)
+			return defaultval
+		}
+		if valint < minval {
+			return minval
+		}
+		return valint
+	}
+	return defaultval
+}
 
 func dial(unixSocketPath string, timeout time.Duration) (*grpc.ClientConn, error) {
 
