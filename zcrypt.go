@@ -23,8 +23,10 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -40,10 +42,10 @@ func zcryptHasNodesSupport() bool {
 	_, err := os.Stat(zcryptclassdir)
 	if err != nil {
 		if os.IsNotExist(err) {
-			log.Printf("zcrypt: No zcrypt multiple nodes support ('%s' does not exist)\n", zcryptclassdir)
+			log.Printf("Zcrypt: No zcrypt multiple nodes support ('%s' does not exist)\n", zcryptclassdir)
 			return false
 		} else {
-			log.Printf("zcrypt: Error reading zcrypt multiple nodes support dir: %s\n", err)
+			log.Printf("Zcrypt: Error reading zcrypt multiple nodes support dir: %s\n", err)
 			return false
 		}
 	}
@@ -68,13 +70,13 @@ func zcryptDestroyNode(nodename string) error {
 	destroyfname := zcryptclassdir + "/" + "destroy"
 	f, err := os.OpenFile(destroyfname, os.O_WRONLY, 0)
 	if err != nil {
-		log.Printf("zcrypt: Can't open file '%s': %s\n", destroyfname, err)
+		log.Printf("Zcrypt: Can't open file '%s': %s\n", destroyfname, err)
 		return err
 	}
 	defer f.Close()
 	_, err = f.WriteString(nodename)
 	if err != nil {
-		log.Printf("zcrypt: Error writing to '%s': %s\n", destroyfname, err)
+		log.Printf("Zcrypt: Error writing to '%s': %s\n", destroyfname, err)
 		return err
 	}
 
@@ -87,12 +89,12 @@ func zcryptCreateNode(nodename string) error {
 	createfname := zcryptclassdir + "/" + "create"
 	f, err := os.OpenFile(createfname, os.O_WRONLY, 0)
 	if err != nil {
-		log.Printf("zcrypt: Can't open file '%s': %s\n", createfname, err)
+		log.Printf("Zcrypt: Can't open file '%s': %s\n", createfname, err)
 		return err
 	}
 	_, err = f.WriteString(nodename)
 	if err != nil {
-		log.Printf("zcrypt: Error writing to '%s': %s\n", createfname, err)
+		log.Printf("Zcrypt: Error writing to '%s': %s\n", createfname, err)
 		f.Close()
 		return err
 	}
@@ -105,9 +107,9 @@ func zcryptCreateNode(nodename string) error {
 		_, err := os.Stat(devname)
 		if err != nil {
 			if !os.IsNotExist(err) {
-				log.Printf("zcrypt: Error waiting for device node '%s' to appear: %s\n", devname, err)
+				log.Printf("Zcrypt: Error waiting for device node '%s' to appear: %s\n", devname, err)
 				zcryptDestroyNode(nodename)
-				return fmt.Errorf("zcrypt: Error waiting for device node '%s' to appear: %w\n", devname, err)
+				return fmt.Errorf("Zcrypt: Error waiting for device node '%s' to appear: %w\n", devname, err)
 			}
 			// powernap
 			time.Sleep(time.Duration(w) * time.Millisecond)
@@ -117,20 +119,20 @@ func zcryptCreateNode(nodename string) error {
 		}
 	}
 	if !ok {
-		log.Printf("zcrypt: Timeout waiting for device node '%s' to appear\n", devname)
+		log.Printf("Zcrypt: Timeout waiting for device node '%s' to appear\n", devname)
 		zcryptDestroyNode(nodename)
-		return fmt.Errorf("Timeout waiting for device node '%s' to appear", devname)
+		return fmt.Errorf("Zcrypt: Timeout waiting for device node '%s' to appear", devname)
 	}
 
 	// adjust filemode for this new zcrypt device node
 	err = os.Chmod(devname, zcryptnodefilemode)
 	if err != nil {
-		log.Printf("zcrypt: Error changing the filemode for the device node: %s\n", err)
+		log.Printf("Zcrypt: Error changing the filemode for the device node: %s\n", err)
 		zcryptDestroyNode(nodename)
-		return fmt.Errorf("zcrypt: Error changing the filemode for the device node: %w\n", err)
+		return fmt.Errorf("Zcrypt: Error changing the filemode for the device node: %w\n", err)
 	}
 
-	log.Printf("zcrypt: Successfully created new zcrypt device node '%s'\n", nodename)
+	log.Printf("Zcrypt: Successfully created new zcrypt device node '%s'\n", nodename)
 
 	return nil
 }
@@ -141,7 +143,7 @@ func zcryptAddAdaptersToNode(nodename string, adapters ...int) error {
 	apmaskfname := zcryptvdevdir + "/" + nodename + "/" + "apmask"
 	f, err := os.OpenFile(apmaskfname, os.O_WRONLY, 0)
 	if err != nil {
-		log.Printf("zcrypt: Can't open file '%s': %s\n", apmaskfname, err)
+		log.Printf("Zcrypt: Can't open file '%s': %s\n", apmaskfname, err)
 		return err
 	}
 	defer f.Close()
@@ -157,7 +159,7 @@ func zcryptAddAdaptersToNode(nodename string, adapters ...int) error {
 		str = str + "\n"
 		_, err = f.WriteString(str)
 		if err != nil {
-			log.Printf("zcrypt: Error writing to '%s': %s\n", apmaskfname, err)
+			log.Printf("Zcrypt: Error writing to '%s': %s\n", apmaskfname, err)
 			return err
 		}
 	}
@@ -171,7 +173,7 @@ func zcryptAddDomainsToNode(nodename string, domains ...int) error {
 	aqmaskfname := zcryptvdevdir + "/" + nodename + "/" + "aqmask"
 	f, err := os.OpenFile(aqmaskfname, os.O_WRONLY, 0)
 	if err != nil {
-		log.Printf("zcrypt: Can't open file '%s': %s\n", aqmaskfname, err)
+		log.Printf("Zcrypt: Can't open file '%s': %s\n", aqmaskfname, err)
 		return err
 	}
 	defer f.Close()
@@ -189,7 +191,7 @@ func zcryptAddDomainsToNode(nodename string, domains ...int) error {
 	if len(domains) > 0 {
 		_, err = fmt.Fprintln(f, b.String())
 		if err != nil {
-			log.Printf("zcrypt: Error writing to '%s': %s\n", aqmaskfname, err)
+			log.Printf("Zcrypt: Error writing to '%s': %s\n", aqmaskfname, err)
 			return err
 		}
 	}
@@ -203,7 +205,7 @@ func zcryptAddIoctlsToNode(nodename string, ioctls ...int) error {
 	ioctlmaskfname := zcryptvdevdir + "/" + nodename + "/" + "ioctlmask"
 	f, err := os.OpenFile(ioctlmaskfname, os.O_WRONLY, 0)
 	if err != nil {
-		log.Printf("zcrypt: Can't open file '%s': %s\n", ioctlmaskfname, err)
+		log.Printf("Zcrypt: Can't open file '%s': %s\n", ioctlmaskfname, err)
 		return err
 	}
 	defer f.Close()
@@ -227,8 +229,8 @@ func zcryptAddIoctlsToNode(nodename string, ioctls ...int) error {
 	}
 	_, err = fmt.Fprintln(f, b.String())
 	if err != nil {
-		log.Printf("zcrypt: Error writing to '%s': %s\n", ioctlmaskfname, err)
-		return fmt.Errorf("zcrypt: Error writing to '%s': %w\n", ioctlmaskfname, err)
+		log.Printf("Zcrypt: Error writing to '%s': %s\n", ioctlmaskfname, err)
+		return fmt.Errorf("Zcrypt: Error writing to '%s': %w\n", ioctlmaskfname, err)
 	}
 
 	return nil
@@ -237,22 +239,47 @@ func zcryptAddIoctlsToNode(nodename string, ioctls ...int) error {
 func zcryptCreateSimpleNode(nodename string, adapter, domain int) error {
 
 	if err := zcryptCreateNode(nodename); err != nil {
-		return fmt.Errorf("zcryptCreateNode('%s') failed: %w\n", nodename, err)
+		return fmt.Errorf("Zcrypt: zcryptCreateNode('%s') failed: %w\n", nodename, err)
 	}
 
 	if err := zcryptAddAdaptersToNode(nodename, adapter); err != nil {
-		return fmt.Errorf("zcryptAddAdaptersToNode('%s') failed: %w\n", nodename, err)
+		return fmt.Errorf("Zcrypt: zcryptAddAdaptersToNode('%s') failed: %w\n", nodename, err)
 	}
 
 	if err := zcryptAddDomainsToNode(nodename, domain); err != nil {
-		return fmt.Errorf("zcryptAddDomainsToNode('%s') failed: %w\n", nodename, err)
+		return fmt.Errorf("Zcrypt: zcryptAddDomainsToNode('%s') failed: %w\n", nodename, err)
 	}
 
 	if err := zcryptAddIoctlsToNode(nodename); err != nil {
-		return fmt.Errorf("zcryptAddIoctlsToNode('%s') failed: %w\n", nodename, err)
+		return fmt.Errorf("Zcrypt: zcryptAddIoctlsToNode('%s') failed: %w\n", nodename, err)
 	}
 
-	log.Printf("simple node '%s' for APQN(%d,%d) created\n", nodename, adapter, domain)
+	log.Printf("Zcrypt: simple node '%s' for APQN(%d,%d) created\n", nodename, adapter, domain)
 
 	return nil
+}
+
+func zcryptFetchActiveNodes() ([]string, error) {
+
+	var nodes []string
+
+	_, err := os.Stat(zcryptvdevdir)
+	if err != nil && os.IsNotExist(err) {
+		return nodes, nil
+	}
+
+	files, err := ioutil.ReadDir(zcryptvdevdir)
+	if err != nil {
+		log.Printf("Zcrypt: Can't read directory %s: %s\n", zcryptvdevdir, err)
+		return nil, fmt.Errorf("Zcrypt: Can't read directory %s: %s\n", zcryptvdevdir, err)
+	}
+
+	for _, f := range files {
+		match, _ := regexp.MatchString("zcrypt-apqn-.*", f.Name())
+		if match {
+			nodes = append(nodes, f.Name())
+		}
+	}
+
+	return nodes, nil
 }

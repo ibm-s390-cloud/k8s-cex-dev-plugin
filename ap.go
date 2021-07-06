@@ -30,27 +30,26 @@ import (
 	"log"
 	"os"
 	"regexp"
-	"sort"
 	"strings"
 )
 
 const (
 	apsysfsdir     = "/sys/bus/ap"
 	apsysfsdevsdir = "/sys/devices/ap"
-	// Estimate how much space one APQN requires when printing
+	// Estimate how much space on APQN requires when printing
 	apqnstringestimate = 6 + 3 + 3 + 4 + 5 + 1
 )
 
 type APQN struct {
-	adapter int
-	domain  int
-	gen     string // something like "cex7"
-	mode    string // mode string "ep11" or "cca" or "accel"
-	online  bool   // true = online, false = offline
+	Adapter int    `json:"adapter"`
+	Domain  int    `json:"domain"`
+	Gen     string `json:"gen"`    // something like "cex7"
+	Mode    string `json:"mode"`   // mode string "ep11" or "cca" or "accel"
+	Online  bool   `json:"online"` // true = online, false = offline
 }
 
 func (a *APQN) String() string {
-	return fmt.Sprintf("(%d,%d,%s,%s,%v)", a.adapter, a.domain, a.gen, a.mode, a.online)
+	return fmt.Sprintf("(%d,%d,%s,%s,%v)", a.Adapter, a.Domain, a.Gen, a.Mode, a.Online)
 }
 
 type APQNList []*APQN
@@ -67,42 +66,14 @@ func (l APQNList) String() string {
 	return b.String()
 }
 
-func (l APQNList) Len() int {
-	return len(l)
-}
-
-func (l APQNList) Less(i, j int) bool {
-	return l[i].mode[0] < l[j].mode[0]
-}
-
-func (l APQNList) Swap(i, j int) {
-	l[i], l[j] = l[j], l[i]
-}
-
-func (l APQNList) filterMode(mode string) APQNList {
-	sort.Sort(l)
-	start, end := 0, len(l)
-	for ; start < end; start++ {
-		if l[start].mode == mode {
-			break
-		}
-	}
-	for ; end > start; end-- {
-		if l[end-1].mode == mode {
-			break
-		}
-	}
-	return l[start:end]
-}
-
 func apHasApSupport() bool {
 
 	_, err := os.Stat(apsysfsdir)
 	if err != nil {
 		if os.IsNotExist(err) {
-			log.Printf("ap: No AP bus support (AP bus sysfs dir does not exit)\n")
+			log.Printf("Ap: No AP bus support (AP bus sysfs dir does not exit)\n")
 		} else {
-			log.Printf("ap: Error reading AP bus sysfs dir: %s\n", err)
+			log.Printf("Ap: Error reading AP bus sysfs dir: %s\n", err)
 		}
 		return false
 	}
@@ -138,15 +109,15 @@ func apScanQueueDir(carddir, queuedir string) (*APQN, error) {
 
 	online, err := apReadFirstLineFromFile(apsysfsdevsdir + "/" + carddir + "/" + queuedir + "/" + "online")
 	if err != nil {
-		log.Printf("ap: Error reading 'online' file from queudir '%s': %s\n", carddir, err)
-		return nil, fmt.Errorf("ap: Error reading 'online' file from queudir '%s': %w\n", carddir, err)
+		log.Printf("Ap: Error reading 'online' file from queudir '%s': %s\n", carddir, err)
+		return nil, fmt.Errorf("Ap: Error reading 'online' file from queudir '%s': %w\n", carddir, err)
 	}
 
 	a := new(APQN)
-	a.adapter = card
-	a.domain = queue
+	a.Adapter = card
+	a.Domain = queue
 	if online[0] == '1' {
-		a.online = true
+		a.Online = true
 	}
 
 	//fmt.Printf("debug: apScanQueueDir apqn=%v\n", a)
@@ -159,25 +130,25 @@ func apScanCardDir(carddir string) (APQNList, error) {
 
 	files, err := ioutil.ReadDir(apsysfsdevsdir + "/" + carddir)
 	if err != nil {
-		log.Printf("ap: Error reading card directory '%s': %s\n", carddir, err)
-		return nil, fmt.Errorf("ap: Error reading card directory '%s': %w\n", carddir, err)
+		log.Printf("Ap: Error reading card directory '%s': %s\n", carddir, err)
+		return nil, fmt.Errorf("Ap: Error reading card directory '%s': %w\n", carddir, err)
 	}
 
 	cardtype, err := apReadFirstLineFromFile(apsysfsdevsdir + "/" + carddir + "/" + "type")
 	if err != nil {
-		log.Printf("ap: Error reading 'type' file from card directory '%s': %s\n", carddir, err)
-		return nil, fmt.Errorf("ap: Error reading 'type' file from card directory '%s': %w\n", carddir, err)
+		log.Printf("Ap: Error reading 'type' file from card directory '%s': %s\n", carddir, err)
+		return nil, fmt.Errorf("Ap: Error reading 'type' file from card directory '%s': %w\n", carddir, err)
 	}
 	match, _ := regexp.MatchString("CEX[[:digit:]]+[ACP]", cardtype)
 	if !match {
-		log.Printf("ap: Error matching cardtype '%s' from card directory '%s'\n", cardtype, carddir)
-		return nil, fmt.Errorf("ap: Error matching cardtype '%s' from card directory '%s'\n", cardtype, carddir)
+		log.Printf("Ap: Error matching cardtype '%s' from card directory '%s'\n", cardtype, carddir)
+		return nil, fmt.Errorf("Ap: Error matching cardtype '%s' from card directory '%s'\n", cardtype, carddir)
 	}
 	var cardgen int
 	var cardmode byte
 	n, err := fmt.Sscanf(cardtype, "CEX%d%c", &cardgen, &cardmode)
 	if err != nil || n != 2 {
-		log.Printf("ap: Error parsing cardtype string '%s' from card directory '%s'\n", cardtype, carddir)
+		log.Printf("Ap: Error parsing cardtype string '%s' from card directory '%s'\n", cardtype, carddir)
 		return nil, err
 	}
 	cgen := fmt.Sprintf("cex%d", cardgen)
@@ -203,8 +174,8 @@ func apScanCardDir(carddir string) (APQNList, error) {
 		if err != nil {
 			return nil, err
 		}
-		a.gen = cgen
-		a.mode = cmode
+		a.Gen = cgen
+		a.Mode = cmode
 		apqns = append(apqns, a)
 	}
 
@@ -212,13 +183,14 @@ func apScanCardDir(carddir string) (APQNList, error) {
 	return apqns, nil
 }
 
-func apScanAPQNs() (APQNList, error) {
+func apScanAPQNs(verbose bool) (APQNList, error) {
 
 	var apqns APQNList
 
+	// scan ap bus dirs and fetch available apqns
 	files, err := ioutil.ReadDir(apsysfsdevsdir)
 	if err != nil {
-		log.Printf("ap: Error reading AP devices sysfs dir: %s\n", err)
+		log.Printf("Ap: Error reading AP devices sysfs dir: %s\n", err)
 		return nil, err
 	}
 	for _, file := range files {
@@ -235,7 +207,42 @@ func apScanAPQNs() (APQNList, error) {
 		apqns = append(apqns, cardapqns...)
 	}
 
-	log.Printf("ap: apScanAPQNs() found %d APQNs: %s\n", len(apqns), apqns)
+	if verbose {
+		log.Printf("Ap: apScanAPQNs() found %d APQNs: %s\n", len(apqns), apqns)
+	}
 
 	return apqns, nil
+}
+
+func apEqualAPQNLists(l1, l2 APQNList) bool {
+
+	var found bool
+
+	if len(l1) != len(l2) {
+		return false
+	}
+
+	for _, a1 := range l1 {
+		found = false
+		for _, a2 := range l2 {
+			if a1.Adapter == a2.Adapter && a1.Domain == a2.Domain {
+				if a1.Gen != a2.Gen {
+					return false
+				}
+				if a1.Mode != a2.Mode {
+					return false
+				}
+				if a1.Online != a2.Online {
+					return false
+				}
+				found = true
+				break
+			}
+		}
+		if !found {
+			return false
+		}
+	}
+
+	return true
 }

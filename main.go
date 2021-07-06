@@ -24,106 +24,59 @@ package main
 import (
 	"flag"
 	"log"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 )
-
-const (
-	cextypeenvname = "CEXTYPE" // environment variable for the cextype
-	ticktime       = 5         // seconds
-)
-
-// main
 
 func main() {
 
-	var cextype string
-
-	log.SetPrefix("Zcrypt-dev-plugin: ")
-	log.Println("S390 zcrypt k8s device plugin starting")
-
-	flag.StringVar(&cextype, "t", "ep11", "Set cextype - one of 'ep11', 'cca' or 'accel'")
+	// workaround for log: exiting because of error: log cannot create log: open ...
+	flag.Set("logtostderr", "true")
 	flag.Parse()
 
-	cextypeenv := os.Getenv(cextypeenvname)
-	if len(cextypeenv) > 0 {
-		cextype = cextypeenv
-		log.Printf("%s='%s' environment variable found\n", cextypeenvname, cextype)
-	}
+	log.Println("Main: S390 k8s z crypto resources plugin starting")
 
-	switch cextype {
-	case "ep11", "cca", "accel":
-		break
-	default:
-		log.Fatalf("Unknown/unsupported cextype '%s'\n", cextype)
-	}
+	// check for AP bus support and machine id fetchable or die
 	if !apHasApSupport() {
-		log.Fatalf("No ap bus support available\n")
+		log.Fatalf("Main: No AP bus support available.\n")
 	}
+	machineId, err := ccGetMachineId()
+	if err != nil {
+		log.Fatalf("Main: Reading machine id failed: %s\n", err)
+	}
+	log.Printf("Main: Machine id is '%s'\n", machineId)
+
+	// initial list of the available apqns on this node or die
+	_, err = apScanAPQNs(true)
+	if err != nil {
+		log.Fatalf("Main: Initial scan of the available APQNs on this node failed: %s\n", err)
+	}
+
+	// read the config file or die
+	cc, err := ccReadConfigFile()
+	if err != nil {
+		log.Fatalf("Main: Reading crypto configuration failed: %s\n", err)
+	}
+	log.Printf("Main: Crypto Configuration successful read\n")
+	cc.PrettyLog()
+	if !cc.Verify() {
+		log.Fatalf("Main: Crypto configuration verification failed.\n")
+	}
+
+	// check for zcrypt multiple node support or die
 	if !zcryptHasNodesSupport() {
-		log.Fatalf("No zcrypt multiple node support available\n")
+		log.Fatalf("Main: No zcrypt multiple node support available\n")
 	}
 
-	zcdevplugin, err := NewZcryptDevPlugin(cextype)
-	if err != nil {
-		log.Fatalf("main: NewZcryptDevPlugin() failed: %s\n", err)
-	}
-	err = zcdevplugin.Start()
-	if err != nil {
-		log.Fatalf("main: plugin start failed: %s\n", err)
+	// start pod lister or die
+	pl := NewPodLister()
+	if err = pl.Start(); err != nil {
+		log.Fatalf("Main: PodLister Start failed: %s\n", err)
 	}
 
-	tickdelay := ticktime * time.Second
-	ticker := time.NewTicker(tickdelay)
+	// enter the crypto resources plugins loop
+	RunZCryptoResPlugins(cc)
 
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	// stop pod lister
+	pl.Stop()
 
-ForLoop:
-	for {
-		select {
-		case <-ticker.C:
-			if zcdevplugin == nil {
-				log.Println("main: trying to reestablish plugin...")
-				zcdevplugin, err = NewZcryptDevPlugin(cextype)
-				if err != nil {
-					log.Println("main: create of plugin failed, will try again later")
-					break
-				}
-				if err := zcdevplugin.Start(); err != nil {
-					log.Println("main: start of plugin failed, will try again later")
-					zcdevplugin = nil
-					break
-				}
-				log.Println("main: plugin successful reestablished")
-			} else {
-				if k8check := checkK8DevicePluginPath(); !k8check {
-					log.Println("main: k8check failed, restarting plugin...")
-					zcdevplugin.Stop()
-					zcdevplugin = nil
-				}
-			}
-		case sig := <-sigChan:
-			switch sig {
-			case syscall.SIGHUP:
-				log.Println("main: Signal 'SIGHUP' received, restarting plugin...")
-				if zcdevplugin != nil {
-					zcdevplugin.Stop()
-				}
-				zcdevplugin = nil
-			default:
-				log.Printf("main: Signal '%v' received, terminating...\n", sig)
-				if zcdevplugin != nil {
-					zcdevplugin.Stop()
-				}
-				break ForLoop
-			}
-		}
-	}
-
-	ticker.Stop()
-
-	log.Println("S390 zcrypt k8s device plugin exit")
+	log.Println("Main: S390 k8s z crypto resources plugin terminating")
 }
