@@ -23,6 +23,8 @@ package main
 
 import (
 	"bufio"
+	"bytes"
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -31,12 +33,23 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync"
+	"time"
 )
 
 const (
 	// configuration file name
-	configfile = "cex_resources.json"
+	configfile = "/config/cex_resources.json"
 )
+
+var (
+	mu   sync.RWMutex
+	cc   *CryptoConfig
+	tag  []byte
+	tick *time.Ticker
+)
+
+var cccheckinterval = time.Duration(getenvint("CRYPTOCONFIG_CHECK_INTERVAL", 120, 120))
 
 type CryptoConfig struct {
 	CryptoConfigSets []*CryptoConfigSet `json:"cryptoconfigsets"`
@@ -351,4 +364,81 @@ func ccGetMachineId() (string, error) {
 	machineid = manufactorer + "-" + machinetype + "-" + sequencecode
 
 	return machineid, nil
+}
+
+func ccGetTag() ([]byte, error) {
+	config, err := os.Open(configfile)
+	if err != nil {
+		log.Printf("CryptoConfig: Can't open config file '%s': %s\n", configfile, err)
+		return nil, fmt.Errorf("CryptoConfig: Can't open config file '%s': %w\n", configfile, err)
+	}
+	defer config.Close()
+	h := sha256.New()
+	if _, err := io.Copy(h, config); err != nil {
+		return nil, fmt.Errorf("Could not generate tag for configuration file '%s': %w\n", configfile, err)
+	}
+	return h.Sum(nil), nil
+}
+
+func updateConfig() error {
+	newtag, err := ccGetTag()
+	if err != nil {
+		return err
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	if bytes.Equal(newtag, tag) {
+		return nil
+	}
+	newcc, err := ccReadConfigFile()
+	if err != nil {
+		return err
+	}
+	if !newcc.Verify() {
+		return fmt.Errorf("Config Watcher: failed to verify new configuration.  Will keep old one...\n")
+	}
+	cc, tag = newcc, newtag
+	log.Println("CryptoConfig: updated configuration")
+	return nil
+}
+
+func InitializeConfigWatcher() (*CryptoConfig, error) {
+	err := updateConfig()
+	if err != nil {
+		return nil, err
+	}
+	tick = time.NewTicker(cccheckinterval * time.Second)
+	go func() {
+		for {
+			t := <- tick.C
+			if t.IsZero() {
+				// Uninitialized time => tick just got closed
+				return
+			}
+			err := updateConfig()
+			if err != nil {
+				log.Printf("Config watcher failed to update config: %w\n", err)
+			}
+		}
+	}()
+	return cc, nil
+}
+
+func StopConfigWatcher() {
+	tick.Stop()
+}
+
+func GetCurrentCryptoConfig() *CryptoConfig {
+	mu.RLock()
+	defer mu.RUnlock()
+	return cc
+}
+
+func GetCurrentCryptoConfigSet(ccset *CryptoConfigSet, resource string, cctag []byte) (*CryptoConfigSet, []byte) {
+	mu.RLock()
+	defer mu.RUnlock()
+	if bytes.Equal(cctag, tag) {
+		return ccset, cctag
+	}
+	return cc.GetCryptoConfigSet(resource), tag
 }

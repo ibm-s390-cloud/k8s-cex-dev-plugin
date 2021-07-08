@@ -56,8 +56,8 @@ spec:
           - name: sys
             mountPath: /sys
           - name: cex-resources-conf
-            mountPath: /work/cex_resources.json
-            subPath: cex_resources.json
+            # the cex_resources.json file is showing up in this dir
+            mountPath: /config/
       volumes:
         # device-plugin gRPC needs this
         - name: device-plugin

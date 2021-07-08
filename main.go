@@ -51,9 +51,12 @@ func main() {
 	}
 
 	// read the config file or die
-	cc, err := ccReadConfigFile()
+	cc, err := InitializeConfigWatcher()
 	if err != nil {
 		log.Fatalf("Main: Reading crypto configuration failed: %s\n", err)
+	}
+	if cc == nil {
+		log.Fatalf("Main: Failed to read crypto configuration\n")
 	}
 	log.Printf("Main: Crypto Configuration successful read\n")
 	cc.PrettyLog()
@@ -73,10 +76,13 @@ func main() {
 	}
 
 	// enter the crypto resources plugins loop
-	RunZCryptoResPlugins(cc)
+	RunZCryptoResPlugins()
 
 	// stop pod lister
 	pl.Stop()
+
+	// stop the config watcher
+	StopConfigWatcher()
 
 	log.Println("Main: S390 k8s z crypto resources plugin terminating")
 }

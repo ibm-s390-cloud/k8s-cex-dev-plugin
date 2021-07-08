@@ -42,13 +42,13 @@ var (
 
 type ZCryptoDPMLister struct {
 	machineid    string
-	cryptoconfig *CryptoConfig
 }
 
 type ZCryptoResPlugin struct {
 	resource    string
 	lister      *ZCryptoDPMLister
 	ccset       *CryptoConfigSet
+	tag         []byte
 	apqns       APQNList
 	devices     []*kdp.Device
 	changedChan chan struct{}
@@ -64,7 +64,7 @@ func (l *ZCryptoDPMLister) GetResourceNamespace() string {
 
 func (z *ZCryptoDPMLister) Discover(nameslist chan dpm.PluginNameList) {
 
-	listofsetnames := z.cryptoconfig.GetListOfSetNames()
+	listofsetnames := GetCurrentCryptoConfig().GetListOfSetNames()
 
 	log.Printf("Plugin: Register plugins for these CryptoConfigSets: %v\n", listofsetnames)
 
@@ -75,10 +75,13 @@ func (z *ZCryptoDPMLister) NewPlugin(resource string) dpm.PluginInterface {
 
 	log.Printf("Plugin: NewPlugin('%s')\n", resource)
 
+	ccset, tag := GetCurrentCryptoConfigSet(nil, resource, nil)
+
 	p := &ZCryptoResPlugin{
 		lister:   z,
 		resource: resource,
-		ccset:    z.cryptoconfig.GetCryptoConfigSet(resource),
+		ccset:    ccset,
+		tag:      tag,
 	}
 	return p
 }
@@ -86,6 +89,13 @@ func (z *ZCryptoDPMLister) NewPlugin(resource string) dpm.PluginInterface {
 func (p *ZCryptoResPlugin) filterAPQNs(apqnlist APQNList) APQNList {
 
 	var apqns APQNList
+
+	ccset, tag := GetCurrentCryptoConfigSet(p.ccset, p.resource, p.tag)
+	p.ccset, p.tag = ccset, tag
+
+	if ccset == nil {
+		return apqns
+	}
 
 	for _, a := range apqnlist {
 		for _, c := range p.ccset.APQNDefs {
@@ -300,7 +310,7 @@ func (p *ZCryptoResPlugin) PreStartContainer(context.Context, *kdp.PreStartConta
 	return nil, fmt.Errorf("PreStartContainer() not implemented\n")
 }
 
-func RunZCryptoResPlugins(cc *CryptoConfig) {
+func RunZCryptoResPlugins() {
 
 	machineid, err := ccGetMachineId()
 	if err != nil {
@@ -309,7 +319,6 @@ func RunZCryptoResPlugins(cc *CryptoConfig) {
 
 	lister := &ZCryptoDPMLister{
 		machineid:    machineid,
-		cryptoconfig: cc,
 	}
 
 	mgr := dpm.NewManager(lister)
