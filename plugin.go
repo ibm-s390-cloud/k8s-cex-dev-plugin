@@ -32,7 +32,7 @@ import (
 )
 
 const (
-	baseResourceName    = "ibm.com/s390/cex-config" // base resource name
+	baseResourceName    = "cex.s390.ibm.com" // base resource name
 )
 
 var (

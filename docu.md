@@ -247,7 +247,7 @@ statement as part of the container's image declaration:
         ...
         resources:
           limits:
-            ibm.com/s390/cex-config/<name_of_the_cex_crypto_config_set>: 1
+            cex.s390.ibm.com/<name_of_the_cex_crypto_config_set>: 1
         ...
 
 The CEX plugin daemonset instances together with the kubernetes infrastructure
@@ -413,7 +413,7 @@ Overcommitment of CEX crypto resources
             command: ["/bin/sh", "-c", "while true; do echo test-crypto-load; sleep 30; done"]
             resources:
               limits:
-                ibm.com/s390/cex-config/blue: 1
+                cex.s390.ibm.com/blue: 1
 
 #### Sample plugin deployment
 
