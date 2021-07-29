@@ -390,12 +390,15 @@ func updateConfig() error {
 	if bytes.Equal(newtag, tag) {
 		return nil
 	}
+	// In case of an error, do not provide any configuration.
+	// If reading and verification succeeds, we will overwrite this below
+	cc, tag = nil, nil
 	newcc, err := ccReadConfigFile()
 	if err != nil {
 		return err
 	}
 	if !newcc.Verify() {
-		return fmt.Errorf("Config Watcher: failed to verify new configuration.  Will keep old one...\n")
+		return fmt.Errorf("Config Watcher: failed to verify new configuration!\n")
 	}
 	cc, tag = newcc, newtag
 	log.Println("CryptoConfig: updated configuration")
