@@ -1,0 +1,9 @@
+os: linux
+arch: s390x
+language: go
+
+services:
+  - docker
+
+script:
+  - make RUNTIME=docker build

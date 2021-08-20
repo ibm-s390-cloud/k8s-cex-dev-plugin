@@ -28,7 +28,7 @@ RUNTIME := podman
 
 .PHONY: build
 build:
-	$(RUNTIME) build -f Dockerfile -t $(IMAGE)
+	$(RUNTIME) build -f Dockerfile -t $(IMAGE) .
 
 .PHONY: push
 push:
