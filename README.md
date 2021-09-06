@@ -1,9 +1,37 @@
-# Kubernetes Device Plugin for IBM CryptoExpress (CEX) cards (s390)
+# Kubernetes device plug-in for IBM CryptoExpress (CEX) cards
 
-The Kubernetes CEX device plugin provides IBM CryptoExpress cards to be made
-available on Kubernetes node(s) for use by containers.
+The Kubernetes device plug-in provides containerized applications access to
+IBM CryptoExpress (CEX) cards on IBM Z and LinuxONE (s390x).
 
-This is version 1 - tested and supported and ready for production use.
+
+## Documentation
+
+You can read the documentation [here](docs/docu.md).
+
+
+## Contributing
+
+Contributions have to be submitted under the Apache License, Version 2.0.
+See also the [LICENSE](LICENSE) file.
+
+### Developer's Certificate of Origin
+
+When making contributions to this project, you certify
+the [Developer Certificate of Origin](https://developercertificate.org/).
+
+### Submitting changes
+
+Create GitHub pull requests to contribute changes to this project.
+Create separate pull requests for each logical enhancement, feature,
+or problem fix.
+
+You can use GitHub Issues to report problems.
+
+## License
+
+The Kubernetes device plug-in for IBM CryptoExpress (CEX) cards is
+licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE)
+for the full license text.
 
 ## Authors
 
