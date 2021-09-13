@@ -44,6 +44,7 @@ Changelog:- [Kubernetes device plug-in for IBM CryptoExpress (CEX) cards](#kuber
       - [Sample CEX resource configuration map](#sample-cex-resource-configuration-map)
       - [Sample crypto load container](#sample-crypto-load-container)
       - [Sample plugin deployment](#sample-plugin-deployment)
+     - [Notices](notices.md)
 
 - 2021/07/08: first draft version
 
@@ -97,13 +98,24 @@ Make sure to read and understand these additional resources before you install t
 xxx CEX crypto cards, modes of operation, domain partitioning, HSM and APQNs
 CEX card Serialnumber, machine id
 
-### Assignment of CEX crypto resources to LPARs, KVM, and z/VM
+### Assignment of CEX crypto resources to LPARs and KVM 
 
-xxx LPAR crypto resources customized on the HMC (see docu xxx)
+<!-- taking out all z/VM mentions ...and z/VM-->
 
-xxx KVM guest crypro resources done on the KVM host (see KVM docu xxx)
+#### Assigning adapters and domains to LPARs
 
-xxx z/VM guest crypto resources xxx (see docu xxx)
+After you set up the Crypto Express adapter in the Support Element, you must allow access to it from your LPAR. You achieve this by using the Hardware Management Console (HMC) or the Support Element (SE).
+You can define a certain LPAR to use a domain (or multiple domains) as a usage domain and as a control domain, or as a control domain only. 
+
+- For details, see section 10.1.3 "Logical partition cryptographic definition" in the IBM Redbook [IBM z15 Configuration Setup](https://www.redbooks.ibm.com/redbooks/pdfs/sg248860.pdf)
+
+#### Assign crypto to Virtual Function I/O (VFIO) 
+
+KVM hosts can use the Virtual Function I/O (VFIO) framework and the VFIO mediated device framework to pass host devices with their attributes through to their KVM guests.
+
+- For details, see [KVM virtual server integration - Assigning cryptographic adapter resources to vfio_ap](https://www.ibm.com/docs/en/linux-on-systems?topic=setup-assign-crypto-vfio)
+
+<!-- xxx z/VM guest crypto resources xxx (see docu xxx)-->
 
 ### Distributing CEX crypto resources for compute nodes across physical
 and/or virtual machine boundaries
