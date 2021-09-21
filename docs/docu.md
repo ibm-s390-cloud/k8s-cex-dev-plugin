@@ -458,7 +458,7 @@ Overcommitment of CEX crypto resources
             {
                 "setname":   "blue",
                 "project":   "blue_project",
-                "cextype":   "cca",
+                "cexmode":   "cca",
                 "apqns":
                 [
                     {
@@ -474,7 +474,7 @@ Overcommitment of CEX crypto resources
             {
                 "setname":   "red",
                 "project":   "red_project",
-                "cextype":   "ep11",
+                "cexmode":   "ep11",
                 "apqns":
                 [
                     {
@@ -492,7 +492,7 @@ Overcommitment of CEX crypto resources
             {
                 "setname":    "green",
                 "project":    "green_project",
-                "cextype":    "cca",
+                "cexmode":    "cca",
                 "ccaaesmkvp": "0xb072bc5c245aac8a"
             },
             {

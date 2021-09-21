@@ -58,7 +58,7 @@ type CryptoConfig struct {
 type CryptoConfigSet struct {
 	SetName   string    `json:"setname"`
 	Project   string    `json:"project"`
-	CexType   string    `json:"cextype"`
+	CexMode   string    `json:"cexmode"`
 	MinCexGen string    `json:"mincexgen"`
 	APQNDefs  []APQNDef `json:"apqns"`
 }
@@ -134,13 +134,13 @@ func (cc CryptoConfig) Verify() bool {
 			log.Printf("%s Projectname is empty\n", prestr)
 			return false
 		}
-		// check cextype
-		if len(s.CexType) > 0 {
-			switch s.CexType {
+		// check cexmode
+		if len(s.CexMode) > 0 {
+			switch s.CexMode {
 			case "ep11", "cca", "accel":
 				break
 			default:
-				log.Printf("%s Unknown/unsupported cextype '%s'\n", prestr, s.CexType)
+				log.Printf("%s Unknown/unsupported cexmode '%s'\n", prestr, s.CexMode)
 				return false
 			}
 		}
@@ -201,8 +201,8 @@ func (cc CryptoConfig) PrettyLog() {
 	for _, e := range cc.CryptoConfigSets {
 		log.Printf("  setname: '%s'\n", e.SetName)
 		log.Printf("    project: '%s'\n", e.Project)
-		if len(e.CexType) > 0 {
-			log.Printf("    cextype: '%s'\n", e.CexType)
+		if len(e.CexMode) > 0 {
+			log.Printf("    cexmode: '%s'\n", e.CexMode)
 		}
 		if len(e.MinCexGen) > 0 {
 			log.Printf("    mincexgen: '%s'\n", e.MinCexGen)
@@ -247,15 +247,15 @@ func (cc CryptoConfig) GetCryptoConfigSet(setname string) *CryptoConfigSet {
 }
 
 func (s CryptoConfigSet) String() string {
-	return fmt.Sprintf("Set(setname=%s,project=%s,cextype=%s,mincexgen=%s,apqndefs=%s)",
-		s.SetName, s.Project, s.CexType, s.MinCexGen, s.APQNDefs)
+	return fmt.Sprintf("Set(setname=%s,project=%s,cexmode=%s,mincexgen=%s,apqndefs=%s)",
+		s.SetName, s.Project, s.CexMode, s.MinCexGen, s.APQNDefs)
 }
 
 func (s CryptoConfigSet) equal(o *CryptoConfigSet) bool {
 
 	if s.SetName != o.SetName ||
 		s.Project != o.Project ||
-		s.CexType != o.CexType ||
+		s.CexMode != o.CexMode ||
 		s.MinCexGen != o.MinCexGen ||
 		len(s.APQNDefs) != len(o.APQNDefs) {
 		return false
