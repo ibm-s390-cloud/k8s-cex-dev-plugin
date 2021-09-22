@@ -10,27 +10,27 @@ Authors:
 
 Changelog:- [Kubernetes device plug-in for IBM CryptoExpress (CEX) cards](#kubernetes-device-plugin-for-ibm-cryptoexpress-cex-cards)
   - [Overview](#overview)
-  - [Setting up the environment for the CEX device plug-in](#setting-up-the-environment-for-the-cex-device-plugin)
+  - [Setting up the environment for the CEX device plug-in](#setting-up-the-environment-for-the-cex-device-plug-in)
     - [Overview on hardware, CEX crypto resources, and Kubernetes compute nodes](#overview-on-hardware-cex-crypto-resources-and-kubernetes-compute-nodes)
-    - [Assignment of CEX crypto resources to LPARs, KVM, and z/VM](#assignment-of-cex-crypto-resources-to-lpars-kvm-and-zvm)
+    - [Assignment of CEX crypto resources to LPARs and KVM](#assignment-of-cex-crypto-resources-to-lpars-and-kvm)
     - [Distributing CEX crypto resources for compute nodes across physical](#distributing-cex-crypto-resources-for-compute-nodes-across-physical)
     - [CEX crypto resources](#cex-crypto-resources)
-  - [Installing the CEX device plug-in](#installing-the-cex-device-plugin)
-  - [Configuring for the CEX device plug-in](#configuring-for-the-cex-device-plugin)
-    - [Considerations for equally configured APQNs](#considerations-for-equally-configured-apqns)
-      - [Sample flow how an APQN is assigned to a container applications](#sample-flow-how-an-apqn-is-assigned-to-a-container-applications)
+  - [Installing the CEX device plug-in](#installing-the-cex-device-plug-in)
+  - [Configuring the CEX device plug-in](#configuring-the-cex-device-plug-in)
+    - [Requirements for equally configured APQNs](#requirements-for-equally-configured-apqns)
+      - [Sample flow how an APQN is assigned to a container application](#sample-flow-how-an-apqn-is-assigned-to-a-container-application)
     - [Creating configuration sets of CEX crypto resources](#creating-configuration-sets-of-cex-crypto-resources)
-      - [Basic definitions](#basic-definitions)
-      - [Defining APQNs](#defining-apqns)
+      - [Basic parameters](#basic-parameters)
+      - [APQN parameters](#apqn-parameters)
       - [Alternative options to identify APQNs](#alternative-options-to-identify-apqns)
     - [Further considerations](#further-considerations)
-  - [Using the CEX device plug-in](#using-the-cex-device-plugin)
+  - [Using the CEX device plug-in](#using-the-cex-device-plug-in)
     - [Requesting crypto configuration sets for container applications](#requesting-crypto-configuration-sets-for-container-applications)
   - [Details and technical reference](#details-and-technical-reference)
     - [config map details](#config-map-details)
       - [optional fields](#optional-fields)
       - [Updates and Rolling out changes on the clusterwide CEX resource configuration](#updates-and-rolling-out-changes-on-the-clusterwide-cex-resource-configuration)
-    - [CEX Device Plugin Details](#cex-device-plugin-details)
+    - [CEX device plug-in details](#cex-device-plug-in-details)
       - [config map](#config-map)
       - [CEX resource registration](#cex-resource-registration)
       - [APQN detection, hotplug and hotunplug, healthy state](#apqn-detection-hotplug-and-hotunplug-healthy-state)
@@ -44,7 +44,7 @@ Changelog:- [Kubernetes device plug-in for IBM CryptoExpress (CEX) cards](#kuber
       - [Sample CEX resource configuration map](#sample-cex-resource-configuration-map)
       - [Sample crypto load container](#sample-crypto-load-container)
       - [Sample plugin deployment](#sample-plugin-deployment)
-     - [Notices](notices.md)
+     - [Notices](#notices)
 
 - 2021/07/08: first draft version
 
@@ -60,7 +60,7 @@ This Kubernetes device plug-in provides access to IBM s390 Crypto Express (CEX)
 cards for s390 Kubernetes container loads. Throughout this publication, the term 'CEX device plug-in'
 is used to refer to this Kubernetes device plug-in.
 
-### Background
+### Overview
 A CEX config map defines one or more crypto configuration sets. A crypto
 configuration set consists of resources of one or more IBM CryptoExpress
 cards. A set is identified by its name and is instantiated as a Kubernetes
@@ -158,7 +158,7 @@ A container must request exactly **one** configuration set and obtains **one**
 CEX crypto resource by the CEX device plugin if one APQN is available,
 healthy, and not already allocated. The APQN is randomly choosen and is assigned to the life time of the container.
 
-#### Sample flow how an APQN is assigned to a container applications
+#### Sample flow how an APQN is assigned to a container application
 
 <!--SN: Do we have a flowchart we could add here?-->
 
@@ -536,3 +536,102 @@ Overcommitment of CEX crypto resources
 
 ####
 control domain
+
+# Notices
+
+This information was developed for products and services offered in the U.S.A. This material might be available from IBM® in other languages. However, you may be required to own a copy of the product or product version in that language in order to access it.
+
+IBM may not offer the products, services, or features discussed in this document in other countries. Consult your local IBM representative for information on the products and services currently available in your area. Any reference to an IBM product, program, or service is not intended to state or imply that only that IBM product, program, or service may be used. Any functionally equivalent product, program, or service that does not infringe any IBM intellectual property rights may be used instead. However, it is the user's responsibility to evaluate and verify the operation of any non-IBM product, program, or service.
+
+IBM may have patents or pending patent applications covering subject matter described in this document. The furnishing of this document does not give you any license to these patents. You can send license inquiries, in writing, to:
+
+*  IBM Director of Licensing   
+     IBM Corporation   
+     North Castle Drive, MD-NC119   
+     Armonk, NY 10504-1785   
+     United States of America*
+
+For license inquiries regarding double-byte \(DBCS\) information, contact the IBM Intellectual Property Department in your country or send inquiries, in writing, to:
+
+*Intellectual Property Licensing   
+ Legal and Intellectual Property Law   
+ IBM Japan Ltd.   
+ 19-21, Nihonbashi-Hakozakicho, Chuo-ku   
+ Tokyo 103-8510, Japan*
+
+INTERNATIONAL BUSINESS MACHINES CORPORATION PROVIDES THIS PUBLICATION “AS IS” WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE. Some jurisdictions do not allow disclaimer of express or implied warranties in certain transactions, therefore this statement may not apply to you.
+
+This information could include technical inaccuracies or typographical errors. Changes are periodically made to the information herein; these changes will be incorporated in new editions of the publication. IBM may make improvements and/or changes in the product\(s\) and/or the program\(s\) described in this publication at any time without notice.
+
+Any references in this information to non-IBM websites are provided for convenience only and do not in any manner serve as an endorsement of those websites. The materials at those websites are not part of the materials for this IBM product and use of those websites is at your own risk.
+
+IBM may use or distribute any of the information you supply in any way it believes appropriate without incurring any obligation to you.
+
+Licensees of this program who want to have information about it for the purpose of enabling: \(i\) the exchange of information between independently created programs and other programs \(including this one\) and \(ii\) the mutual use of the information which has been exchanged, should contact
+
+*  IBM Director of Licensing   
+     IBM Corporation   
+     North Castle Drive, MD-NC119   
+     Armonk, NY 10504-1785   
+     United States of America*
+
+Such information may be available, subject to appropriate terms and conditions, including in some cases, payment of a fee.
+
+The licensed program described in this document and all licensed material available for it are provided by IBM under terms of the IBM Customer Agreement, IBM International Programming License Agreement, or any equivalent agreement between us.
+
+Information concerning non-IBM products was obtained from the suppliers of those products, their published announcements or other publicly available sources. IBM has not tested those products and cannot confirm the accuracy of performance, compatibility or any other claims related to non-IBM products. Questions on the capabilities of non-IBM products should be addressed to the suppliers of those products.
+
+This information is for planning purposes only. The information herein is subject to change before the products described become available.
+
+This information contains examples of data and reports used in daily business operations. To illustrate them as completely as possible, the examples include the names of individuals, companies, brands, and products. All of these names are fictitious and any similarity to actual people or business enterprises is entirely coincidental.
+
+Portions of this information are provided under the Apache v2 license [https://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+COPYRIGHT LICENSE:
+
+This information contains sample application programs in source language, which illustrate programming techniques on various operating platforms. You may copy, modify, and distribute these sample programs in any form without payment to IBM, for the purposes of developing, using, marketing or distributing application programs conforming to the application programming interface for the operating platform for which the sample programs are written. These examples have not been thoroughly tested under all conditions. IBM, therefore, cannot guarantee or imply reliability, serviceability, or function of these programs. The sample programs are provided "AS IS", without warranty of any kind. IBM shall not be liable for any damages arising out of your use of the sample programs.
+
+## Trademarks
+
+Helm™ and the Helm logo are trademarks of The Linux® Foundation, and use of them as a trademark is subject to The Linux Foundation's Trademark Usage Guidelines at [https://www.linuxfoundation.org/trademark-usage/](https://www.linuxfoundation.org/trademark-usage/).
+
+IBM, the IBM logo, and ibm.com® are trademarks or registered trademarks of International Business Machines Corp., registered in many jurisdictions worldwide. Other product and service names might be trademarks of IBM or other companies. A current list of IBM trademarks is available on the Web at [Copyright and trademark information](https://www.ibm.com/legal/copytrade) at www.ibm.com/legal/copytrade.shtml.
+
+Java™ and all Java-based trademarks and logos are trademarks or registered trademarks of Oracle and/or its affiliates.
+
+The registered trademark Linux is used pursuant to a sublicense from the Linux Foundation, the exclusive licensee of Linus Torvalds, owner of the mark on a worldwide basis.
+
+Kubernetes® and the Kubernetes logo are registered trademarks of The Linux Foundation, and use of them as a trademark is subject to The Linux Foundation's Trademark Usage Guidelines at [https://www.linuxfoundation.org/trademark-usage/](https://www.linuxfoundation.org/trademark-usage/).
+
+Red Hat®, OpenShift®, and Ansible® are registered trademarks of Red Hat, Inc. or its subsidiaries in the United States and other countries.
+
+UNIX® is a registered trademark of The Open Group in the United States and other countries.
+
+## Terms and conditions for product documentation
+
+Permissions for the use of these publications are granted subject to the following terms and conditions.
+
+-   **Applicability**
+
+    These terms and conditions are in addition to any terms of use for the IBM® website.
+
+-   **Personal use**
+
+    You may reproduce these publications for your personal, noncommercial use provided that all proprietary notices are preserved. You may not distribute, display or make derivative work of these publications, or any portion thereof, without the express consent of IBM®.
+
+-   **Commercial use**
+
+    You may reproduce, distribute and display these publications solely within your enterprise provided that all proprietary notices are preserved. You may not make derivative works of these publications, or reproduce, distribute or display these publications or any portion thereof outside your enterprise, without the express consent of IBM®.
+
+-   **Rights**
+
+    Except as expressly granted in this permission, no other permissions, licenses or rights are granted, either express or implied, to the publications or any information, data, software or other intellectual property contained therein.
+
+    IBM® reserves the right to withdraw the permissions granted herein whenever, in its discretion, the use of the publications is detrimental to its interest or, as determined by IBM®, the above instructions are not being properly followed.
+
+    You may not download, export or re-export this information except in full compliance with all applicable laws and regulations, including all United States export laws and regulations.
+
+    IBM® MAKES NO GUARANTEE ABOUT THE CONTENT OF THESE PUBLICATIONS. THE PUBLICATIONS ARE PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
+
+
+
