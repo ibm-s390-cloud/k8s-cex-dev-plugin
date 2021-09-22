@@ -30,6 +30,8 @@ var (
 	version = "development"
 	git_url = "https://github.com/ibm-s390-cloud/k8s-cex-dev-plugin.git"
 	git_commit = "unknown"
+
+	machineId = ""
 )
 
 func main() {

@@ -134,7 +134,7 @@ func (p *ZCryptoResPlugin) makePluginDevsFromAPQNs() []*kdp.Device {
 
 func (p *ZCryptoResPlugin) checkApqnsChanged() bool {
 
-	fmt.Printf("Plugin['%s']: checkApqnsChanged() rescanning available APQNs\n", p.resource)
+	log.Printf("Plugin['%s']: checkApqnsChanged() rescanning available APQNs\n", p.resource)
 
 	allnodeapqns, err := apScanAPQNs(false)
 	if err != nil {

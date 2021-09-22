@@ -246,6 +246,22 @@ func (cc CryptoConfig) GetCryptoConfigSet(setname string) *CryptoConfigSet {
 	return nil
 }
 
+func (cc CryptoConfig) GetCryptoConfigSetForThisAPQN(ap, dom int, machineid string) *CryptoConfigSet {
+
+	for _, s := range cc.CryptoConfigSets {
+		for _, a := range s.APQNDefs {
+			if a.Adapter == ap && a.Domain == dom {
+				if len(a.MachineId) > 0 && a.MachineId != machineid {
+					continue;
+				}
+				return s
+			}
+		}
+	}
+
+	return nil
+}
+
 func (s CryptoConfigSet) String() string {
 	return fmt.Sprintf("Set(setname=%s,project=%s,cexmode=%s,mincexgen=%s,apqndefs=%s)",
 		s.SetName, s.Project, s.CexMode, s.MinCexGen, s.APQNDefs)
