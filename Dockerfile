@@ -18,6 +18,12 @@
 
 FROM golang:1.14 as build
 
+# define build arguments, as buildah needs them after the FROM
+ARG VERSION
+ARG RELEASE
+ARG GIT_URL
+ARG GIT_COMMIT
+
 # make build dir /build
 WORKDIR /build
 
@@ -29,10 +35,18 @@ RUN go mod download
 COPY ap.go cryptoconfigs.go main.go plugin.go podlister.go shadowsysfs.go zcrypt.go ./
 
 # Build the application
-RUN CGO_ENABLED=0 GO111MODULE=on go build -o cex-plugin .
+RUN CGO_ENABLED=0 GO111MODULE=on go build -v -o cex-plugin \
+    -ldflags="-X 'main.version=${VERSION}' -X 'main.git_url=${GIT_URL}' \
+    -X 'main.git_commit=${GIT_COMMIT}'" .
 
 # now do the runtime image
 FROM scratch
+
+# define build arguments, as buildah needs them after the FROM
+ARG VERSION
+ARG RELEASE
+ARG GIT_URL
+ARG GIT_COMMIT
 
 WORKDIR /licenses
 COPY LICENSE license
@@ -41,6 +55,14 @@ WORKDIR /work
 COPY --from=build /build/cex-plugin ./
 
 LABEL name="cex-plugin-v1.0" \
-  description="A Kubernetes device plugin for s390 supporting CEX crypto cards"
+      description="A Kubernetes device plugin for s390 supporting CEX crypto cards" \
+      description="Kubernetes device plug-in for IBM CryptoExpress (CEX) cards for for IBM Z and LinuxONE (s390x)" \
+      summary="Kubernetes device plug-in for IBM CryptoExpress (CEX) cards for for IBM Z and LinuxONE (s390x)" \
+      maintainer="TODO" \
+      vendor="IBM" \
+      version="${VERSION}" \
+      release="${RELEASE}" \
+      git_url="${GIT_URL}" \
+      git_commit="${GIT_COMMIT}"
 
 ENTRYPOINT ["/work/cex-plugin"]

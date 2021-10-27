@@ -26,6 +26,12 @@ import (
 	"log"
 )
 
+var (
+	version = "development"
+	git_url = "https://github.com/ibm-s390-cloud/k8s-cex-dev-plugin.git"
+	git_commit = "unknown"
+)
+
 func main() {
 
 	// workaround for log: exiting because of error: log cannot create log: open ...
@@ -33,6 +39,9 @@ func main() {
 	flag.Parse()
 
 	log.Println("Main: S390 k8s z crypto resources plugin starting")
+	log.Printf("Plugin Version: %s\n", version)
+	log.Printf("Git URL:        %s\n", git_url)
+	log.Printf("Git Commit:     %s\n", git_commit)
 
 	// check for AP bus support and machine id fetchable or die
 	if !apHasApSupport() {
