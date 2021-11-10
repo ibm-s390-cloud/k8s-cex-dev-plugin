@@ -32,8 +32,7 @@ spec:
           - name: vartmp
             mountPath: /var/tmp
       containers:
-        # Adapt to your image name. Here is a sample for the OCP image registry.
-      - image: 'image-registry.openshift-image-registry.svc:5000/kube-system/cex-plugin-v1:latest'
+      - image: 'quay.io/ibm/ibm-cex-plugin-cm:v1.0.0'
         imagePullPolicy: Always
         name: cex-plugin
         securityContext:
