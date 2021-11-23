@@ -1,4 +1,4 @@
-# Notices
+# Notices {:#notices}
 
 This information was developed for products and services offered in the U.S.A. This material might be available from IBM® in other languages. However, you may be required to own a copy of the product or product version in that language in order to access it.
 
@@ -52,7 +52,7 @@ COPYRIGHT LICENSE:
 
 This information contains sample application programs in source language, which illustrate programming techniques on various operating platforms. You may copy, modify, and distribute these sample programs in any form without payment to IBM, for the purposes of developing, using, marketing or distributing application programs conforming to the application programming interface for the operating platform for which the sample programs are written. These examples have not been thoroughly tested under all conditions. IBM, therefore, cannot guarantee or imply reliability, serviceability, or function of these programs. The sample programs are provided "AS IS", without warranty of any kind. IBM shall not be liable for any damages arising out of your use of the sample programs.
 
-## Trademarks
+## Trademarks {: #trademarks}
 
 Helm™ and the Helm logo are trademarks of The Linux® Foundation, and use of them as a trademark is subject to The Linux Foundation's Trademark Usage Guidelines at [https://www.linuxfoundation.org/trademark-usage/](https://www.linuxfoundation.org/trademark-usage/).
 
@@ -68,7 +68,7 @@ Red Hat®, OpenShift®, and Ansible® are registered trademarks of Red Hat, Inc.
 
 UNIX® is a registered trademark of The Open Group in the United States and other countries.
 
-## Terms and conditions for product documentation
+## Terms and conditions for product documentation {: #terms-and-conditions-for-product-documentation}
 
 Permissions for the use of these publications are granted subject to the following terms and conditions.
 

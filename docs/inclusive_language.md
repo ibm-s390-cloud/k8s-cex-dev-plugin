@@ -1,4 +1,4 @@
-# Inclusive language
+# Inclusive language {: #inclusive-language}
 
 While IBM values the use of inclusive language, terms that are outside of IBM's direct influence are sometimes required for the sake of maintaining user understanding. As other industry leaders join IBM in embracing the use of inclusive language, IBM will continue to update the documentation to reflect those changes.
 

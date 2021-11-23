@@ -6,7 +6,16 @@ IBM CryptoExpress (CEX) cards on IBM Z and LinuxONE (s390x).
 
 ## Documentation
 
-You can read the documentation [here](docs/docu.md).
+You can get the documentation [here](https://www.ibm.com/support/pages/node/6520698).
+
+
+## How to obtain the image
+
+The Kubernetes device plug-in is released once as a community version, available
+on [quay.io](https://quay.io/repository/ibm/ibm-cex-plugin-cm).
+
+Additionally there is also the certified image for use within
+RedHat OpenShift Container Platform, available [here](https://catalog.redhat.com/software/containers/ibm/ibm-cex-device-plugin-cm/61b1c724f90e846f0ebdb112).
 
 
 ## Contributing
