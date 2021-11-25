@@ -36,7 +36,7 @@ import (
 const (
 	apsysfsdir     = "/sys/bus/ap"
 	apsysfsdevsdir = "/sys/devices/ap"
-	// Estimate how much space on APQN requires when printing
+	// Estimate how much space an APQN requires when printing
 	apqnstringestimate = 6 + 3 + 3 + 4 + 5 + 1
 )
 
@@ -71,7 +71,7 @@ func apHasApSupport() bool {
 	_, err := os.Stat(apsysfsdir)
 	if err != nil {
 		if os.IsNotExist(err) {
-			log.Printf("Ap: No AP bus support (AP bus sysfs dir does not exit)\n")
+			log.Printf("Ap: No AP bus support (AP bus sysfs dir does not exist)\n")
 		} else {
 			log.Printf("Ap: Error reading AP bus sysfs dir: %s\n", err)
 		}
@@ -109,8 +109,8 @@ func apScanQueueDir(carddir, queuedir string) (*APQN, error) {
 
 	online, err := apReadFirstLineFromFile(apsysfsdevsdir + "/" + carddir + "/" + queuedir + "/" + "online")
 	if err != nil {
-		log.Printf("Ap: Error reading 'online' file from queudir '%s': %s\n", carddir, err)
-		return nil, fmt.Errorf("Ap: Error reading 'online' file from queudir '%s': %w\n", carddir, err)
+		log.Printf("Ap: Error reading 'online' file from queuedir '%s': %s\n", carddir, err)
+		return nil, fmt.Errorf("Ap: Error reading 'online' file from queuedir '%s': %w\n", carddir, err)
 	}
 
 	a := new(APQN)

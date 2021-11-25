@@ -289,7 +289,7 @@ func (pl *PodLister) doLoop() error {
 						sn.last = time.Now()
 						//log.Printf("PodLister: last timestamp of sysfsshadow '%s' refreshed\n", snname)
 					} else {
-						log.Printf("PodLister: sysfsshadow '%s' not found in sysfsshadowmap !!!\n", snname)
+						log.Printf("PodLister: sysfs shadow '%s' not found in sysfs shadowmap !!!\n", snname)
 					}
 				}
 			}

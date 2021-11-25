@@ -69,7 +69,7 @@ func main() {
 	if cc == nil {
 		log.Fatalf("Main: Failed to read crypto configuration\n")
 	}
-	log.Printf("Main: Crypto Configuration successful read\n")
+	log.Printf("Main: Crypto configuration successful read\n")
 	cc.PrettyLog()
 	if !cc.Verify() {
 		log.Fatalf("Main: Crypto configuration verification failed.\n")
