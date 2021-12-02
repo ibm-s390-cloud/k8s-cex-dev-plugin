@@ -256,7 +256,7 @@ func (pl *PodLister) doLoop() error {
 						continue
 					}
 					// find the crypto config set to which this apqn belongs
-					ccset :=  GetCurrentCryptoConfig().GetCryptoConfigSetForThisAPQN(card, queue, machineId);
+					ccset :=  GetCurrentCryptoConfig().GetCryptoConfigSetForThisAPQN(card, queue, MachineId);
 					if ccset == nil {
 						log.Printf("PodLister: config set for APQN(%d,%d) not found\n", card, queue);
 					} else {

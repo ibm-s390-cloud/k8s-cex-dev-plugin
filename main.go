@@ -31,7 +31,7 @@ var (
 	git_url = "https://github.com/ibm-s390-cloud/k8s-cex-dev-plugin.git"
 	git_commit = "unknown"
 
-	machineId = ""
+	MachineId = ""
 )
 
 func main() {
@@ -49,11 +49,12 @@ func main() {
 	if !apHasApSupport() {
 		log.Fatalf("Main: No AP bus support available.\n")
 	}
-	machineId, err := ccGetMachineId()
+	mid, err := ccGetMachineId()
 	if err != nil {
 		log.Fatalf("Main: Reading machine id failed: %s\n", err)
 	}
-	log.Printf("Main: Machine id is '%s'\n", machineId)
+	MachineId = mid
+	log.Printf("Main: Machine id is '%s'\n", MachineId)
 
 	// initial list of the available apqns on this node or die
 	_, err = apScanAPQNs(true)
