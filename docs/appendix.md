@@ -157,6 +157,9 @@
                 valueFrom:
                   fieldRef:
                     fieldPath: spec.nodeName
+              # logically overcommit (share) CEX resources (if >1)
+              - name: APQN_OVERCOMMIT_LIMIT
+                value: "1"
             volumeMounts:
               - name: device-plug-in
                 mountPath: /var/lib/kubelet/device-plugins
