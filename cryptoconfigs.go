@@ -49,7 +49,7 @@ var (
 	tick *time.Ticker
 )
 
-var cccheckinterval = time.Duration(getenvint("CRYPTOCONFIG_CHECK_INTERVAL", 120, 120))
+var Cccheckinterval = time.Duration(getenvint("CRYPTOCONFIG_CHECK_INTERVAL", 120, 120))
 
 type CryptoConfig struct {
 	CryptoConfigSets []*CryptoConfigSet `json:"cryptoconfigsets"`
@@ -433,7 +433,7 @@ func InitializeConfigWatcher() (*CryptoConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	tick = time.NewTicker(cccheckinterval * time.Second)
+	tick = time.NewTicker(Cccheckinterval * time.Second)
 	go func() {
 		for {
 			t := <-tick.C

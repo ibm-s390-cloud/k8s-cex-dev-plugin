@@ -25,6 +25,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sort"
 	"time"
 
 	"github.com/kubevirt/device-plugin-manager/pkg/dpm"
@@ -32,16 +33,17 @@ import (
 )
 
 const (
-	baseResourceName    = "cex.s390.ibm.com" // base resource name
+	baseResourceName = "cex.s390.ibm.com" // base resource name
 )
 
 var (
-	apqnOverCommitLimit = getenvint("APQN_OVERCOMMIT_LIMIT", 1, 1) // overcommit limit: 1 is no overcommit
+	apqnOverCommitLimit = getenvint("APQN_OVERCOMMIT_LIMIT", 1, 1)                // overcommit limit: 1 is no overcommit
 	apqnsCheckInterval  = time.Duration(getenvint("APQN_CHECK_INTERVAL", 30, 10)) // device health check interval in seconds
 )
 
 type ZCryptoDPMLister struct {
 	machineid    string
+	setnameslist []string
 }
 
 type ZCryptoResPlugin struct {
@@ -62,13 +64,49 @@ func (l *ZCryptoDPMLister) GetResourceNamespace() string {
 	return baseResourceName
 }
 
-func (z *ZCryptoDPMLister) Discover(nameslist chan dpm.PluginNameList) {
+func (z *ZCryptoDPMLister) Discover(nameslistchan chan dpm.PluginNameList) {
 
-	listofsetnames := GetCurrentCryptoConfig().GetListOfSetNames()
+	areTheseSortedStringListsEqual := func(l1, l2 []string) bool {
+		if len(l1) != len(l2) {
+			return false
+		}
+		for i, _ := range l1 {
+			if l1[i] != l2[i] {
+				return false
+			}
+		}
+		return true
+	}
 
-	log.Printf("Plugin: Register plugins for these CryptoConfigSets: %v\n", listofsetnames)
+	// prepare and announce the initial list of crypto config setnames
+	sets := GetCurrentCryptoConfig().GetListOfSetNames()
+	sort.Strings(sets)
+	z.setnameslist = sets
+	log.Printf("Plugin: Register plugins for these CryptoConfigSets: %v\n", z.setnameslist)
+	nameslistchan <- dpm.PluginNameList(z.setnameslist)
 
-	nameslist <- dpm.PluginNameList(listofsetnames)
+	// every Cccheckinterval seconds check if the list of setnames has changed
+	tick := time.NewTicker(Cccheckinterval * time.Second)
+	defer tick.Stop()
+	for {
+		select {
+		case <-nameslistchan:
+			return
+		case t := <-tick.C:
+			if t.IsZero() {
+				return
+			}
+			sets = GetCurrentCryptoConfig().GetListOfSetNames()
+			sort.Strings(sets)
+			if !areTheseSortedStringListsEqual(sets, z.setnameslist) {
+				z.setnameslist = sets
+				log.Printf("Plugin: Found crypto config set changes. Reannouncing: %v\n", z.setnameslist)
+				nameslistchan <- dpm.PluginNameList(z.setnameslist)
+			} else if len(z.setnameslist) == 0 {
+				log.Printf("Plugin: No crypto config sets available, check configuration !\n")
+			}
+		}
+	}
 }
 
 func (z *ZCryptoDPMLister) NewPlugin(resource string) dpm.PluginInterface {
@@ -134,7 +172,7 @@ func (p *ZCryptoResPlugin) makePluginDevsFromAPQNs() []*kdp.Device {
 
 func (p *ZCryptoResPlugin) checkApqnsChanged() bool {
 
-	log.Printf("Plugin['%s']: checkApqnsChanged() rescanning available APQNs\n", p.resource)
+	//log.Printf("Plugin['%s']: checkApqnsChanged() rescanning available APQNs\n", p.resource)
 
 	allnodeapqns, err := apScanAPQNs(false)
 	if err != nil {
@@ -181,7 +219,7 @@ func (p *ZCryptoResPlugin) Start() error {
 	allnodeapqns, err := apScanAPQNs(false)
 	if err != nil {
 		log.Printf("Plugin['%s']: failure trying to scan node APQNs: %s\n", p.resource, err)
-		return fmt.Errorf("Plugin['%s']: fatal failure at start\n", p.resource)
+		return fmt.Errorf("Plugin['%s']: fatal failure at start", p.resource)
 	}
 
 	p.apqns = p.filterAPQNs(allnodeapqns)
@@ -226,7 +264,10 @@ func (p *ZCryptoResPlugin) ListAndWatch(e *kdp.Empty, s kdp.DevicePlugin_ListAnd
 		select {
 		case <-p.stopChan:
 			return nil
-		case <-p.changedChan:
+		case _, ok := <-p.changedChan:
+			if !ok {
+				return nil
+			}
 			log.Printf("Plugin['%s']: ListAndWatch() Re-announcing %d devices: %s\n",
 				p.resource, len(p.devices), p.devices)
 			s.Send(&kdp.ListAndWatchResponse{Devices: p.devices})
@@ -257,7 +298,7 @@ func (p *ZCryptoResPlugin) Allocate(ctx context.Context, req *kdp.AllocateReques
 			n, err := fmt.Sscanf(id, "apqn-%d-%d-%d", &card, &queue, &overcount)
 			if err != nil || n < 3 {
 				log.Printf("Plugin['%s']: Error parsing device id '%s'\n", p.resource, id)
-				return nil, fmt.Errorf("Error parsing device id '%s'\n", id)
+				return nil, fmt.Errorf("Error parsing device id '%s'", id)
 			}
 			// check and maybe create a zcrypt device node
 			znode := fmt.Sprintf("zcrypt-apqn-%d-%d-%d", card, queue, overcount)
@@ -267,7 +308,7 @@ func (p *ZCryptoResPlugin) Allocate(ctx context.Context, req *kdp.AllocateReques
 				if err != nil {
 					log.Printf("Plugin['%s']: Error creating zcrypt node '%s': %s\n", p.resource, znode, err)
 					defer zcryptDestroyNode(znode)
-					return nil, fmt.Errorf("Error creating zcrypt node '%s'\n", znode)
+					return nil, fmt.Errorf("Error creating zcrypt node '%s'", znode)
 				}
 			} else {
 				//fmt.Printf("debug Plugin['%s']: zcrypt device node '%s' already exists\n", p.resource, znode)
@@ -283,7 +324,7 @@ func (p *ZCryptoResPlugin) Allocate(ctx context.Context, req *kdp.AllocateReques
 			if err != nil {
 				log.Printf("Plugin['%s']: Error creating shadow sysfs for device '%s': %s\n", p.resource, id, err)
 				defer zcryptDestroyNode(znode)
-				return nil, fmt.Errorf("Error creating shadow sysfs for device '%s'\n", id)
+				return nil, fmt.Errorf("Error creating shadow sysfs for device '%s'", id)
 			}
 			carsp.Mounts = append(carsp.Mounts, &kdp.Mount{
 				ContainerPath: "/sys/bus/ap",
@@ -307,7 +348,7 @@ func (p *ZCryptoResPlugin) Allocate(ctx context.Context, req *kdp.AllocateReques
 func (p *ZCryptoResPlugin) PreStartContainer(context.Context, *kdp.PreStartContainerRequest) (*kdp.PreStartContainerResponse, error) {
 
 	//log.Printf("Plugin['%s']: PreStartContainer()\n", p.resource)
-	return nil, fmt.Errorf("PreStartContainer() not implemented\n")
+	return nil, fmt.Errorf("PreStartContainer() not implemented")
 }
 
 func RunZCryptoResPlugins() {
@@ -318,7 +359,7 @@ func RunZCryptoResPlugins() {
 	}
 
 	lister := &ZCryptoDPMLister{
-		machineid:    machineid,
+		machineid: machineid,
 	}
 
 	mgr := dpm.NewManager(lister)
