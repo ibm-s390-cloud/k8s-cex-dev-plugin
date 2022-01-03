@@ -224,37 +224,43 @@ func (cc CryptoConfig) PrettyLog() {
 	}
 }
 
-func (cc CryptoConfig) GetListOfSetNames() []string {
+func (cc *CryptoConfig) GetListOfSetNames() []string {
 
 	var sets []string
 
-	for _, s := range cc.CryptoConfigSets {
-		sets = append(sets, s.SetName)
+	if cc != nil {
+		for _, s := range cc.CryptoConfigSets {
+			sets = append(sets, s.SetName)
+		}
 	}
 
 	return sets
 }
 
-func (cc CryptoConfig) GetCryptoConfigSet(setname string) *CryptoConfigSet {
+func (cc *CryptoConfig) GetCryptoConfigSet(setname string) *CryptoConfigSet {
 
-	for _, s := range cc.CryptoConfigSets {
-		if s.SetName == setname {
-			return s
+	if cc != nil {
+		for _, s := range cc.CryptoConfigSets {
+			if s.SetName == setname {
+				return s
+			}
 		}
 	}
 
 	return nil
 }
 
-func (cc CryptoConfig) GetCryptoConfigSetForThisAPQN(ap, dom int, machineid string) *CryptoConfigSet {
+func (cc *CryptoConfig) GetCryptoConfigSetForThisAPQN(ap, dom int, machineid string) *CryptoConfigSet {
 
-	for _, s := range cc.CryptoConfigSets {
-		for _, a := range s.APQNDefs {
-			if a.Adapter == ap && a.Domain == dom {
-				if len(a.MachineId) > 0 && a.MachineId != machineid {
-					continue;
+	if cc != nil {
+		for _, s := range cc.CryptoConfigSets {
+			for _, a := range s.APQNDefs {
+				if a.Adapter == ap && a.Domain == dom {
+					if len(a.MachineId) > 0 && a.MachineId != machineid {
+						continue
+					}
+					return s
 				}
-				return s
 			}
 		}
 	}
@@ -302,19 +308,19 @@ func ccReadConfigFile() (*CryptoConfig, error) {
 	config, err := os.Open(configfile)
 	if err != nil {
 		log.Printf("CryptoConfig: Can't open config file '%s': %s\n", configfile, err)
-		return nil, fmt.Errorf("CryptoConfig: Can't open config file '%s': %w\n", configfile, err)
+		return nil, fmt.Errorf("CryptoConfig: Can't open config file '%s': %w", configfile, err)
 	}
 	defer config.Close()
 
 	rawdata, err := ioutil.ReadAll(config)
 	if err != nil {
 		log.Printf("CryptoConfig: Error reading config file '%s': %s\n", configfile, err)
-		return nil, fmt.Errorf("CryptoConfig: Error reading config file '%s': %w\n", configfile, err)
+		return nil, fmt.Errorf("CryptoConfig: Error reading config file '%s': %w", configfile, err)
 	}
 
 	if err = json.Unmarshal(rawdata, &cc); err != nil {
 		log.Printf("CryptoConfig: Error parsing config file '%s': %s\n", configfile, err)
-		return nil, fmt.Errorf("CryptoConfig: Error parsing config file '%s': %w\n", configfile, err)
+		return nil, fmt.Errorf("CryptoConfig: Error parsing config file '%s': %w", configfile, err)
 	}
 
 	return &cc, nil
@@ -329,12 +335,12 @@ func ccGetMachineId() (string, error) {
 	sysinfo, err := os.Open(sysinfofile)
 	if err != nil {
 		log.Printf("CryptoConfig: Can't open sysinfo file '%s': %s\n", sysinfofile, err)
-		return "", fmt.Errorf("CryptoConfig: Can't open sysinfo file '%s': %w\n", sysinfofile, err)
+		return "", fmt.Errorf("CryptoConfig: Can't open sysinfo file '%s': %w", sysinfofile, err)
 	}
 	defer sysinfo.Close()
 
-	manufactorer := ""
-	reManufactorer := regexp.MustCompile("Manufacturer:[[:space:]]+(.+)")
+	manufacturer := ""
+	reManufacturer := regexp.MustCompile("Manufacturer:[[:space:]]+(.+)")
 	machinetype := ""
 	reMachinetype := regexp.MustCompile("Type:[[:space:]]+(.+)")
 	sequencecode := ""
@@ -348,18 +354,18 @@ func ccGetMachineId() (string, error) {
 		}
 		if err != nil {
 			log.Printf("CryptoConfig: Error reading sysinfo file '%s': %s\n", sysinfofile, err)
-			return "", fmt.Errorf("CryptoConfig: Error reading sysinfo file '%s': %w\n", sysinfofile, err)
+			return "", fmt.Errorf("CryptoConfig: Error reading sysinfo file '%s': %w", sysinfofile, err)
 		}
 		str := strings.TrimSpace(line)
-		if len(manufactorer) == 0 {
-			match := reManufactorer.FindStringSubmatch(str)
+		if len(manufacturer) == 0 {
+			match := reManufacturer.FindStringSubmatch(str)
 			if match != nil {
-				manufactorer = match[1]
+				manufacturer = match[1]
 			}
 		}
-		match := reManufactorer.FindStringSubmatch(str)
+		match := reManufacturer.FindStringSubmatch(str)
 		if match != nil {
-			manufactorer = match[1]
+			manufacturer = match[1]
 		}
 		match = reMachinetype.FindStringSubmatch(str)
 		if match != nil {
@@ -370,14 +376,14 @@ func ccGetMachineId() (string, error) {
 			sequencecode = match[1]
 		}
 	}
-	//fmt.Printf("Manufactorer=%s\n", manufactorer)
+	//fmt.Printf("Manufacturer=%s\n", manufacturer)
 	//fmt.Printf("Machinetype=%s\n", machinetype)
 	//fmt.Printf("Sequencecode=%s\n", sequencecode)
-	if len(manufactorer) == 0 || len(machinetype) == 0 || len(sequencecode) == 0 {
-		log.Printf("CryptoConfig: Error extracting fields 'Manufactorer', 'Type' and 'Sequence Code' from sysinfo\n")
-		return "", fmt.Errorf("CryptoConfig: Error extracting fields 'Manufactorer', 'Type' and 'Sequence Code' from sysinfo\n")
+	if len(manufacturer) == 0 || len(machinetype) == 0 || len(sequencecode) == 0 {
+		log.Printf("CryptoConfig: Error extracting fields 'Manufacturer', 'Type' and 'Sequence Code' from sysinfo\n")
+		return "", fmt.Errorf("CryptoConfig: Error extracting fields 'Manufacturer', 'Type' and 'Sequence Code' from sysinfo")
 	}
-	machineid = manufactorer + "-" + machinetype + "-" + sequencecode
+	machineid = manufacturer + "-" + machinetype + "-" + sequencecode
 
 	return machineid, nil
 }
@@ -386,12 +392,12 @@ func ccGetTag() ([]byte, error) {
 	config, err := os.Open(configfile)
 	if err != nil {
 		log.Printf("CryptoConfig: Can't open config file '%s': %s\n", configfile, err)
-		return nil, fmt.Errorf("CryptoConfig: Can't open config file '%s': %w\n", configfile, err)
+		return nil, fmt.Errorf("CryptoConfig: Can't open config file '%s': %w", configfile, err)
 	}
 	defer config.Close()
 	h := sha256.New()
 	if _, err := io.Copy(h, config); err != nil {
-		return nil, fmt.Errorf("Could not generate tag for configuration file '%s': %w\n", configfile, err)
+		return nil, fmt.Errorf("Could not generate tag for configuration file '%s': %w", configfile, err)
 	}
 	return h.Sum(nil), nil
 }
@@ -406,18 +412,19 @@ func updateConfig() error {
 	if bytes.Equal(newtag, tag) {
 		return nil
 	}
+	log.Printf("CryptoConfig: Configuration changes detected\n")
 	// In case of an error, do not provide any configuration.
 	// If reading and verification succeeds, we will overwrite this below
 	cc, tag = nil, nil
 	newcc, err := ccReadConfigFile()
 	if err != nil {
-		return err
+		return fmt.Errorf("CryptoConfig: Failed to read or parse the new configuration!")
 	}
 	if !newcc.Verify() {
-		return fmt.Errorf("Config Watcher: failed to verify new configuration!\n")
+		return fmt.Errorf("CryptoConfig: Failed to verify new configuration!")
 	}
 	cc, tag = newcc, newtag
-	log.Println("CryptoConfig: updated configuration")
+	log.Printf("CryptoConfig: Configuration successful updated\n")
 	return nil
 }
 
@@ -429,14 +436,14 @@ func InitializeConfigWatcher() (*CryptoConfig, error) {
 	tick = time.NewTicker(cccheckinterval * time.Second)
 	go func() {
 		for {
-			t := <- tick.C
+			t := <-tick.C
 			if t.IsZero() {
 				// Uninitialized time => tick just got closed
 				return
 			}
 			err := updateConfig()
 			if err != nil {
-				log.Printf("Config watcher failed to update config: %w\n", err)
+				log.Printf("CryptoConfig: Failed to update config: %s\n", err)
 			}
 		}
 	}()
