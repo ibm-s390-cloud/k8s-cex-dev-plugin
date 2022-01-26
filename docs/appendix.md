@@ -128,11 +128,10 @@
           name: cex-plug-in
       template:
         metadata:
-          annotations:
-            scheduler.alpha.kubernetes.io/critical-pod: ""
           labels:
             name: cex-plug-in
         spec:
+          priorityClassName: system-cluster-critical
           tolerations:
           - key: CriticalAddonsOnly
             operator: Exists
