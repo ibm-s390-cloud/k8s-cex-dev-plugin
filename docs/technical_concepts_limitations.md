@@ -25,7 +25,7 @@ or
 
     CryptoConfig: Error parsing config file ...
 
-If the verification step fails, the following message is displayed: 
+If the verification step fails, the following message is displayed:
 
     Config Watcher: failed to verify new configuration!
 
@@ -37,7 +37,7 @@ is finally accepted as valid.
 **Note:** After an update of a configuration map, the cluster needs some time
 (typically up to 2 minutes) to propagate the changes to all nodes.
 Another, potentially faster, way to update the configuration map for the plug-in is to
-restart the rollout of the deployment via: 
+restart the rollout of the deployment via:
 
     kubectl rollout restart daemonset <name-of-the-cex-plug-in-daemonset> -n kube-system
 
@@ -86,7 +86,7 @@ when the container terminates.
 
 With version 1 of the CEX device plug-in, the constructed zcrypt device nodes limit
 access to exact one APQN (adapter, usage domain, no control domain), allowing
-all ioctls. 
+all ioctls.
 
 **Note:** These settings allow both usage and control actions, which are restricted to the underlying APQN with the `/dev/z90crypt`
 device that is visible inside the container, even with overcommited plug-in devices.
@@ -147,7 +147,7 @@ still visible in the LPAR and thus in the compute node but similar to the
 All this might cause the CEX device plug-in to deal with varying CEX
 resources. The plug-in code is capable of handling hot plug, hot unplug, the
 *online* state changes of CEX resources, and reports changes in the config set to
-the Kubernetes system. Because of this handling, APQNs can be included 
+the Kubernetes system. Because of this handling, APQNs can be included
 into the CEX config sets, which might not exist at the time of first deployment of
 the CEX configuration map. At a later time the card is hot plugged and assigned to the
 running LPAR. The cluster will spot this and make the appearing APQNs, which
@@ -194,13 +194,13 @@ set up `/var/tmp/shadowsysfs` for use in a SELinux-enabled environment.
 ### Namespaces and the project field {: #namespaces-and-the-project-field}
 
 The `project` field of a CEX config set should match the namespace of the
-container requesting a member of this set. This results in only *blue* applications 
+container requesting a member of this set. This results in only *blue* applications
 being able to allocate *blue* APQNs from the *blue* config set.
 
 Unfortunately, the allocation request forwarded from the Kubernetes system to the
 CEX device plug-in does not provide any namespace information. Therefore, the plug-in is not able to check the namespace affiliation.
 
-When the container runs, the surveillance loop of the CEX device plug-in detects this mismatch and displays a log entry: 
+When the container runs, the surveillance loop of the CEX device plug-in detects this mismatch and displays a log entry:
 
 `PodLister: Container <aaa> in namespace <bbb> uses a CEX resource <ccc> marked for project <ddd>!`.
 

@@ -45,11 +45,11 @@ have access to the allocated APQN and a customized `/sys/devices/ap` and
 `/sys/bus/ap` providing a limited view of the AP/zcrypt world.
 
 When the container finally finishes, the CEX device plug-in on the compute node spots
-this, cleans up the allocated resources, and the Kubernetes system marks the plug-in-device as unused. 
+this, cleans up the allocated resources, and the Kubernetes system marks the plug-in-device as unused.
 The allocated resources which are cleaned up are the customized additional zcrypt
 device node and the sysfs shadow dirs.
 
-## Frequently asked questions 
+## Frequently asked questions
 
 Q: What happens when all CEX resources within one config set are assigned to
 running containers and a new pod/container requesting a CEX resource from this

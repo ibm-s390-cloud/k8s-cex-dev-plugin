@@ -228,13 +228,13 @@
 
 
     #!/bin/bash
-    
+
     # This script produces a yaml file with quota restrictions
     # for the cex cryptosets for each given namespace.
     # Apply the resulting yaml file and then only the namespace <nnn>
     # is allowed  to allocate CEX resources from a crypto set
     # marked with project <nnn>.
-    
+
     createquota () {
         QF=quota-$1.yaml
         cat << EOF >> $QF
@@ -249,7 +249,7 @@
           limits.cex.s390.ibm.com/$2: 0
     EOF
     }
-    
+
     while ! test -z "$1"; do
         n=$1
         shift

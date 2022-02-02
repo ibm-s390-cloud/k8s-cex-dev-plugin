@@ -23,13 +23,13 @@ compute nodes.
 <!-- point of view? -->
 The point of view for a KVM guest running as a Kubernetes compute node is similar to the view of the LPAR. A compute node might have zero or more crypto adapters assigned and zero or more domains, which can be seen as a 2-dimensional table of APQNs.
 
-This documentation does not cover the assignment and distribution of crypto resources to LPARs, KVM hosts, and KVM guests. For details, see: 
+This documentation does not cover the assignment and distribution of crypto resources to LPARs, KVM hosts, and KVM guests. For details, see:
 
 * Section 10.1.3 "Configuring Crypto Express7S" in the IBM Redbook [IBM z15 Configuration Setup](https://www.redbooks.ibm.com/abstracts/sg248860.html)
 
 * [Configuring Crypto Express Adapters for KVM Guests](https://www.ibm.com/docs/en/linux-on-systems?topic=kvm-configuring-crypto-express-adapters-guests)
 
-For more information on Crypto Express cards, generations, and operation modes see: 
+For more information on Crypto Express cards, generations, and operation modes see:
 * https://www.ibm.com/security/cryptocards
 
 Usually the adapter/domain pair is sufficient to identify an APQN. However, if the compute nodes of a cluster are distributed over multiple IBM Z or LinuxONE machines a unique machine identification (*machine-id*) is needed in addition to the adapter and domain information.

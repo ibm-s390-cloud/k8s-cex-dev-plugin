@@ -10,7 +10,7 @@ The sources of the CEX device plug-in are located on github:
 
   `podman pull registry.connect.redhat.com/ibm/ibm-cex-device-plugin-cm:<version>`
 
-* To use the community version, run: 
+* To use the community version, run:
 
   `podman pull quay.io/ibm/ibm-cex-plugin-cm:<version>`
 
@@ -29,13 +29,13 @@ privileges. Kubernetes uses the concept of a *DaemonSet* for this kind of
 cluster-wide service. The git repository shows a sample daemonset yaml file, which provides all the needed settings and options to run the CEX device plug-in as
 Kubernetes daemonset. A working sample is provided in the appendix [Sample CEX device plug-in daemonset yaml](appendix.md#sample-cex-device-plug-in-daemonset-yaml).
 
-To successfully run the CEX device plug-in the daemonset yaml, consider: 
+To successfully run the CEX device plug-in the daemonset yaml, consider:
 
 - `namespace`: The CEX device plug-in instances need to run in namespace
   `kube-system` as this is the same namespace where the CEX ConfigMap
   resides.
 - `securityContext`: Must be *privileged* because the plug-in code needs access to some directories and files on the compute node:
-  -  To establish an IPC connection to the kubelet. 
+  -  To establish an IPC connection to the kubelet.
   -  To do administrative tasks. For example, create and destroy zcrypt additional device nodes.
   -  To build and provide directory trees to be mounted into the client containers. For example, shadow sysfs.
 - `volumes`: The plug-in needs some volumes from the compute node:
@@ -55,7 +55,7 @@ To successfully run the CEX device plug-in the daemonset yaml, consider:
   from the yaml file when there is no need.
 
 After obtaining the CEX device plug-in daemonset yaml file you should screen and maybe
-update the plug-in image source registry and then apply it with the following command: 
+update the plug-in image source registry and then apply it with the following command:
 
     kubectl create -f <my_cex_plug-in_daemonset.yaml>
 
@@ -64,7 +64,7 @@ A few seconds later a pod 'cex-plug-in' in namespace `kube-system` should run on
 ## Further details on the CEX device plug-in {: #further-details-on-the-cex-device-plug-in}
 
 A CEX device plug-in instance is an ordinary application built from Golang code. The
-application provides a lot of information about what is 
+application provides a lot of information about what is
 going on via stdout/stderr. You can generate the output with the `kubectl logs <pod>` command, which should contain the namespace `-n kube-system` option.
 
 The CEX device plug-in application initially screens all the available APQNS on the
@@ -78,7 +78,7 @@ https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/device
 After registration the CEX device plug-in is ready for allocation requests forwarded
 from the kubelet service. Such an allocation request is triggered by a crypto
 load pod requesting a CEX resource from the config set. The allocation request
-is processed and creates:  
+is processed and creates:
 - A new zcrypt device node and forwards it to the container.
 - Sysfs shadow directories and makes sure they are mounted on to the
   correct place within the container.
@@ -93,7 +93,7 @@ In addition, there are some secondary tasks to do:
   reannouncements to the Kubernetes system. If verification fails, an error
   message `Config Watcher: failed to verify new configuration!` is shown. The
   plug-in continues to run without CEX crypto configuration and is thus
-  unable to satisfy allocation requests. For details see: 
+  unable to satisfy allocation requests. For details see:
   [CEX configuration ConfigMap updates](technical_concepts_limitations.md#cex-configuration-configmap-updates).
 - Surveillance of pods with CEX resources allocated: Every
   `PODLISTER_POLL_INTERVAL` (default is 30s) the list of pods, which have a

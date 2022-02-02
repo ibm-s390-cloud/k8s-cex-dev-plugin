@@ -9,7 +9,7 @@ In the CEX resource configuration, equivalent APQNs are grouped into equivalence
 
 ### Considerations for equally configured APQNs {: #considerations-for-equally-configured-apqns}
 
-Within each config set, all the APQNs must be set up consistently. 
+Within each config set, all the APQNs must be set up consistently.
 For each CEX mode, consider:
 - For Common Cryptographic Architecture (CCA) CEX resources, the
   master keys and access control point settings should be equal.
@@ -22,7 +22,7 @@ The cluster-wide configuration of the CEX crypto resources is kept in a Kubernet
 
 A working sample is provided in the appendix [Sample CEX resource configuration map](appendix.md#sample-cex-resource-configuration-map).
 
-The following example shows only the head and some possibly *crypto config set* definitions: 
+The following example shows only the head and some possibly *crypto config set* definitions:
 
 ~~~json
 
@@ -76,13 +76,13 @@ set comprises the following entries:
   this is not fully implemented as there are limits on the existing
   API preventing this. For details, see: [Limitations](technical_concepts_limitations.md#limitations).
 - `cexmode`: optional, specifies the CEX mode. If specified, one of the
-  following choices is required: `ep11`, `cca`, or `accel`.  
+  following choices is required: `ep11`, `cca`, or `accel`.
   Adds an extra verification step every time the APQNs on each node are screened
   by the CEX device plug-in. All APQNs of the configuration set must match the
   specified CEX mode. On mismatches, the CEX device plug-in creates a log entry
-  and discards the use of this APQN for the configuration set.  
+  and discards the use of this APQN for the configuration set.
   <!-- JS working on implementation for v1.1 - `mincexgen`: optional, specifies the minimum CEX card generation for the
-  configuation set. If specified, must match to `cex[4-7]`.  
+  configuation set. If specified, must match to `cex[4-7]`.
   Adds an extra verification step every time the APQNs on each compute node are
   screened. All APQNs of the configuration set are checked to have at least the
   specified CEX card generation. On mismatches, the CEX device plug-in creates a
@@ -92,12 +92,12 @@ set comprises the following entries:
 
 * `apqns`: A list of equivalent APQN entries. The exact meaning of *equivalent* depends on the crypto workload to be run with the *crypto config set*. However, it forms a set of APQNs where anyone is sufficient to fulfill the needs of the requesting crypto workload container. See
   [Considerations for equally configured APQNs](#considerations-for-equally-configured-apqns).
-  
-  For example, a CCA application that uses a given AES secure key always relies on APQNs with a master key that wraps this secure key, 
+
+  For example, a CCA application that uses a given AES secure key always relies on APQNs with a master key that wraps this secure key,
   regardless on which container it runs. In other words the master key setup of the APQNs within a ConfigSet should be the same.
 
   <!-- RB: to be discussed delete first sentence An APQN ... config set. -->
-  An APQN must not be member of more than one *crypto config set*. It is valid to provide an empty list. 
+  An APQN must not be member of more than one *crypto config set*. It is valid to provide an empty list.
   It is also valid to provide APQNs, which might currently not exist but might come into existence sometime in future when new crypto cards are plugged.
 
   The most simple APQN entry comprises these two fields:
@@ -113,38 +113,38 @@ set comprises the following entries:
   - `machineid`: optional, is only required when the compute nodes are
     physically located on different hardware instances and the APQN pairs
     (adapter, domain) are not unique. If specified, the value must be entered as
-    follows:  
+    follows:
     `<manufacturer>-<machinetype>-<sequencecode>`
     with
     - `<manufacturer>` – value of the `Manufacturer` line from `/proc/sysinfo`
     - `<machinetype>` – value of the `Type` line from `/proc/sysinfo`
     - `<sequencecode>` – value of the `Sequence Code` line from `/proc/sysinfo`
-    
+
     For example, a valid value for `machineid` is `IBM-3906-00000000000829E7`.
-    
-    The tuple (a,d) gets extended with the machine id, which is unique per hardware instance and the triple (a,d,maschineid) identifies an APQN again uniquely within the hardware instances. 
-    
+
+    The tuple (a,d) gets extended with the machine id, which is unique per hardware instance and the triple (a,d,maschineid) identifies an APQN again uniquely within the hardware instances.
+
 <!-- BEGIN - Commented out. This is stuff for future development
   Instead of the `adapter` field a `serialnr` field can be specified:
   + `serialnr`: specifies the serial number of the crypto card as listed in
-    the respective sysfs file `/sys/devices/ap/cardxx/serialnr`.  
+    the respective sysfs file `/sys/devices/ap/cardxx/serialnr`.
     For example, `93AABEET` is a valid serial number string. The serial number
     of a CEX crypto card is unique world-wide.
     A `domain` value is required to identify an APQN using (serialnr,domain).
     xxx an explanation of how to obtain the serial number for a card should
     be here also - TKE ? sysfs  -->
-  
+
 <!--### Alternative options to identify APQNs {: #alternative-options-to-identify-apqns}
-Alternatively APQNs can be identified based on the CEX mode. You can use them 
+Alternatively APQNs can be identified based on the CEX mode. You can use them
 instead of specifying `apqn`.
 - `ccaaesmkvp`: specifies the CCA AES master key verification pattern against
-  which all APQNs on all the compute nodes are matched. This hexadecimal value 
+  which all APQNs on all the compute nodes are matched. This hexadecimal value
   is listed for each CCA queue `xx.yyyy` in the
   respective sysfs file `/sys/devices/ap/cardxx/xx.yyyy/mkvps` in the
    `AES CUR` line.  For example, `0xb072bc5c245aac8a` is a valid value.
   TODO for v1.1 !!!
 - `ep11wkvp`: specifies the EP11 master wrapping key verification pattern
-  against which all APQNs on all the compute nodes are matched. This hexadecimal value 
+  against which all APQNs on all the compute nodes are matched. This hexadecimal value
   is listed for each EP11 queue `xx.yyyy` in the
   respective sysfs file `/sys/devices/ap/cardxx/xx.yyyy/mkvps` in the `WK CUR`
   line. For example,
@@ -155,8 +155,8 @@ instead of specifying `apqn`.
 An APQN must not be member of more than one crypto config set.  In the absense of any other
 parameters (like cexmode and mincexgen) that means an APQN identifier must not be a member
 of more than one crypto config set. If an APQN identifier is a member of more than one crypto
-config set, then each set must contain additional paramerters such that only one crypto 
-config set declares a valid APQN with said APQN identifier (e.g. each crypto config set 
+config set, then each set must contain additional paramerters such that only one crypto
+config set declares a valid APQN with said APQN identifier (e.g. each crypto config set
 including APQN identifier (1,1) has a different cexmode).
 Note, version 1 will enforce that no APQN identifier is a memeber of more than one crypto config set.
 -->

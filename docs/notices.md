@@ -6,19 +6,27 @@ IBM may not offer the products, services, or features discussed in this document
 
 IBM may have patents or pending patent applications covering subject matter described in this document. The furnishing of this document does not give you any license to these patents. You can send license inquiries, in writing, to:
 
-*  IBM Director of Licensing   
-     IBM Corporation   
-     North Castle Drive, MD-NC119   
-     Armonk, NY 10504-1785   
-     United States of America*
+&nbsp;&nbsp;&nbsp;&nbsp;*IBM Director of Licensing*
+
+&nbsp;&nbsp;&nbsp;&nbsp;*IBM Corporation*
+
+&nbsp;&nbsp;&nbsp;&nbsp;*North Castle Drive, MD-NC119*
+
+&nbsp;&nbsp;&nbsp;&nbsp;*Armonk, NY 10504-1785*
+
+&nbsp;&nbsp;&nbsp;&nbsp;*United States of America*
 
 For license inquiries regarding double-byte \(DBCS\) information, contact the IBM Intellectual Property Department in your country or send inquiries, in writing, to:
 
-*Intellectual Property Licensing   
- Legal and Intellectual Property Law   
- IBM Japan Ltd.   
- 19-21, Nihonbashi-Hakozakicho, Chuo-ku   
- Tokyo 103-8510, Japan*
+&nbsp;&nbsp;&nbsp;&nbsp;*Intellectual Property Licensing*
+
+&nbsp;&nbsp;&nbsp;&nbsp;*Legal and Intellectual Property Law*
+
+&nbsp;&nbsp;&nbsp;&nbsp;*IBM Japan Ltd.*
+
+&nbsp;&nbsp;&nbsp;&nbsp;*19-21, Nihonbashi-Hakozakicho, Chuo-ku*
+
+&nbsp;&nbsp;&nbsp;&nbsp;*Tokyo 103-8510, Japan*
 
 INTERNATIONAL BUSINESS MACHINES CORPORATION PROVIDES THIS PUBLICATION “AS IS” WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE. Some jurisdictions do not allow disclaimer of express or implied warranties in certain transactions, therefore this statement may not apply to you.
 
@@ -30,11 +38,15 @@ IBM may use or distribute any of the information you supply in any way it believ
 
 Licensees of this program who want to have information about it for the purpose of enabling: \(i\) the exchange of information between independently created programs and other programs \(including this one\) and \(ii\) the mutual use of the information which has been exchanged, should contact
 
-*  IBM Director of Licensing   
-     IBM Corporation   
-     North Castle Drive, MD-NC119   
-     Armonk, NY 10504-1785   
-     United States of America*
+&nbsp;&nbsp;&nbsp;&nbsp;*IBM Director of Licensing*
+
+&nbsp;&nbsp;&nbsp;&nbsp;*IBM Corporation*
+
+&nbsp;&nbsp;&nbsp;&nbsp;*North Castle Drive, MD-NC119*
+
+&nbsp;&nbsp;&nbsp;&nbsp;*Armonk, NY 10504-1785*
+
+&nbsp;&nbsp;&nbsp;&nbsp;*United States of America*
 
 Such information may be available, subject to appropriate terms and conditions, including in some cases, payment of a fee.
 
@@ -93,5 +105,3 @@ Permissions for the use of these publications are granted subject to the followi
     You may not download, export or re-export this information except in full compliance with all applicable laws and regulations, including all United States export laws and regulations.
 
     IBM® MAKES NO GUARANTEE ABOUT THE CONTENT OF THESE PUBLICATIONS. THE PUBLICATIONS ARE PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
-
-

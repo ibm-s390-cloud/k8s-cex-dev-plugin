@@ -1,6 +1,6 @@
 # Version 1.0 release notes
 
-Version 1.0 of the Kubernetes device plug-in for IBM Crypto Express (CEX) cards is the initial release of this new plug-in. 
+Version 1.0 of the Kubernetes device plug-in for IBM Crypto Express (CEX) cards is the initial release of this new plug-in.
 It provides containerized applications access to IBM Crypto Express (CEX) cards on IBM Z® and IBM LinuxONE (s390).
 
 ## Features
@@ -15,7 +15,7 @@ The following features are included in the initial release:
 
 ## Known issues
 
-There are no known issues. See [Limitations](technical_concepts_limitations.md#limitations) for the list of current limitations. 
+There are no known issues. See [Limitations](technical_concepts_limitations.md#limitations) for the list of current limitations.
 
 <!--For a list of the features and improvements that were introduced in version xx , see What's new
 With this offering, the following new features are introduced:
