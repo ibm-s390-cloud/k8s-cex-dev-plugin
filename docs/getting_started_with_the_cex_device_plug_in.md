@@ -87,6 +87,10 @@ set comprises the following entries:
   screened. All APQNs of the configuration set are checked to have at least the
   specified CEX card generation. On mismatches, the CEX device plug-in creates a
   log entry and discards the use of the APQN for the configuration set.TODO for v1.1 -->
+- `overcommit`: optional, specifies the overcommit limit for resources in
+  this ConfigSet. If the parameter is omitted, it defaults to the value
+  specified through the environment variable APQN_OVERCOMMIT_LIMIT. If the environment
+  variable is not specified, the default value for overcommit is 1 (no overcommit).
 
 ### APQN parameters {: #apqn-parameters}
 

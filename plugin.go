@@ -124,19 +124,14 @@ func (z *ZCryptoDPMLister) NewPlugin(resource string) dpm.PluginInterface {
 	return p
 }
 
-func (p *ZCryptoResPlugin) filterAPQNs(apqnlist APQNList) APQNList {
-
+func (p *ZCryptoResPlugin) filterAPQNs(ccset *CryptoConfigSet, apqnlist APQNList) APQNList {
 	var apqns APQNList
-
-	ccset, tag := GetCurrentCryptoConfigSet(p.ccset, p.resource, p.tag)
-	p.ccset, p.tag = ccset, tag
-
 	if ccset == nil {
 		return apqns
 	}
 
 	for _, a := range apqnlist {
-		for _, c := range p.ccset.APQNDefs {
+		for _, c := range ccset.APQNDefs {
 			if a.Adapter != c.Adapter || a.Domain != c.Domain {
 				continue
 			}
@@ -154,12 +149,18 @@ func (p *ZCryptoResPlugin) makePluginDevsFromAPQNs() []*kdp.Device {
 
 	var devices []*kdp.Device
 
+	if p.ccset.Overcommit <= 0 {
+		p.ccset.Overcommit = apqnOverCommitLimit
+		log.Printf("Plugin['%s']: Overcommit not specified in ConfigSet, fallback to %d \n",
+			p.resource, apqnOverCommitLimit)
+	}
+
 	for _, a := range p.apqns {
 		health := kdp.Healthy
 		if !a.Online {
 			health = kdp.Unhealthy
 		}
-		for i := 0; i < apqnOverCommitLimit; i++ {
+		for i := 0; i < p.ccset.Overcommit; i++ {
 			devices = append(devices, &kdp.Device{
 				ID:     fmt.Sprintf("apqn-%d-%d-%d", a.Adapter, a.Domain, i),
 				Health: health,
@@ -170,9 +171,12 @@ func (p *ZCryptoResPlugin) makePluginDevsFromAPQNs() []*kdp.Device {
 	return devices
 }
 
-func (p *ZCryptoResPlugin) checkApqnsChanged() bool {
+func (p *ZCryptoResPlugin) checkChanged() bool {
 
-	//log.Printf("Plugin['%s']: checkApqnsChanged() rescanning available APQNs\n", p.resource)
+	//log.Printf("Plugin['%s']: checkChanged() rescanning available APQNs\n", p.resource)
+
+	var apqnsChanged, configChanged bool
+	ccset, tag := GetCurrentCryptoConfigSet(p.ccset, p.resource, p.tag)
 
 	allnodeapqns, err := apScanAPQNs(false)
 	if err != nil {
@@ -180,21 +184,35 @@ func (p *ZCryptoResPlugin) checkApqnsChanged() bool {
 		return false
 	}
 
-	apqns := p.filterAPQNs(allnodeapqns)
-	if apEqualAPQNLists(apqns, p.apqns) {
-		log.Printf("Plugin['%s']: Rescan found %d eligible APQNs but no changes\n", p.resource, len(apqns))
-		return false
-	} else {
-		log.Printf("Plugin['%s']: Rescan found %d eligible APQNs (with changes): %s\n", p.resource, len(apqns), apqns)
+	// check for change in APQNs
+	apqns := p.filterAPQNs(ccset, allnodeapqns)
+	if !apEqualAPQNLists(apqns, p.apqns) {
+		log.Printf("Plugin['%s']: Rescan found %d eligible APQNs (with changes): %s\n",
+			p.resource, len(apqns), apqns)
+		apqnsChanged = true
+	}
+
+	// check for change in ConfigSet (currently only overcommit limit)
+	if ccset != nil && ccset.Overcommit != p.ccset.Overcommit {
+		log.Printf("Plugin['%s']: Rescan found changes in ConfigSet: overcommit limit has changed\n",
+			p.resource)
+		configChanged = true
+	}
+
+	if apqnsChanged || configChanged {
+		p.ccset, p.tag = ccset, tag
 		p.apqns = apqns
 		p.devices = p.makePluginDevsFromAPQNs()
 		log.Printf("Plugin['%s']: Derived %d plugin devices from the list of APQNs\n",
 			p.resource, len(p.devices))
 		return true
+	} else {
+		log.Printf("Plugin['%s']: no changes\n", p.resource)
+		return false
 	}
 }
 
-func (p *ZCryptoResPlugin) checkApqnsChangedLoop() {
+func (p *ZCryptoResPlugin) checkChangedLoop() {
 
 	tick := time.NewTicker(apqnsCheckInterval * time.Second)
 
@@ -205,9 +223,9 @@ ForLoop:
 			tick.Stop()
 			break ForLoop
 		case <-tick.C:
-			if p.checkApqnsChanged() {
+			if p.checkChanged() {
 				p.changedChan <- struct{}{}
-			}
+			} 
 		}
 	}
 }
@@ -222,7 +240,7 @@ func (p *ZCryptoResPlugin) Start() error {
 		return fmt.Errorf("Plugin['%s']: fatal failure at start", p.resource)
 	}
 
-	p.apqns = p.filterAPQNs(allnodeapqns)
+	p.apqns = p.filterAPQNs(p.ccset, allnodeapqns)
 	log.Printf("Plugin['%s']: Found %d eligible APQNs: %s\n", p.resource, len(p.apqns), p.apqns)
 
 	p.devices = p.makePluginDevsFromAPQNs()
@@ -232,7 +250,7 @@ func (p *ZCryptoResPlugin) Start() error {
 	p.stopChan = make(chan struct{})
 	p.changedChan = make(chan struct{})
 
-	go p.checkApqnsChangedLoop()
+	go p.checkChangedLoop()
 
 	return nil
 }

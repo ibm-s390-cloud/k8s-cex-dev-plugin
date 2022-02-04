@@ -60,11 +60,24 @@ Setting the environment variable `APQN_OVERCOMMIT_LIMIT` to a value greater than
 Kubernetes system for each APQN. For example, with three APQNs available within a
 config set and an overcommit value of 10, 30 CEX plug-in devices are
 allocatable and up to 30 containers could successfully request a CEX resource.
+The environment variable is specified in the DaemonSet YAML file via the `env`
+parameter.
+
+You can specify the optional ConfigSet parameter "overcommit" to control the
+overcommit limit at config set level. If this parameter is omitted, the value
+defaults to the environment variable.
 
 Eventually, more than one container will share one APQN with overcommitment
 enabled. This exposes no security weakness, but might result in lower
 performance for the crypto operations within each container.
 
+**Note:** Dynamically changing the overcommit value, either by changing the
+environment variable, or by changing the overcommit parameter of a config set,
+changes the number of available CEX resources. If the number of available resources
+increases, containers waiting for resources might be able to run. Whereas
+already running containers continue to run, even if a used resource is no more
+available because of the decreased number of available resources. Due to lack
+of resources, those containers cannot be restarted.
 
 ## The device node z90crypt {: #the-device-node-z90crypt}
 

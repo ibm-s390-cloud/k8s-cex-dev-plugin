@@ -16,6 +16,7 @@
                 "setname":   "CCA_for_customer_1",
                 "project":   "customer-1",
                 "cexmode":   "cca",
+                "overcommit": 3,
                 "apqns":
                 [
                     {
@@ -39,6 +40,7 @@
                 "setname":   "CCA_for_customer_2",
                 "project":   "customer-2",
                 "cexmode":   "cca",
+                "overcommit": 4,
                 "apqns":
                 [
                     {
@@ -96,6 +98,7 @@
                 "setname":   "Accel",
                 "project":   "default",
                 "cexmode":   "accel",
+                "overcommit": 5,
                 "apqns":
                 [
                     {

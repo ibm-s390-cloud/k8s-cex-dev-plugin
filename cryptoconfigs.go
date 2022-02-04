@@ -60,6 +60,7 @@ type CryptoConfigSet struct {
 	Project   string    `json:"project"`
 	CexMode   string    `json:"cexmode"`
 	MinCexGen string    `json:"mincexgen"`
+	Overcommit int      `json:"overcommit"`
 	APQNDefs  []APQNDef `json:"apqns"`
 }
 
@@ -152,6 +153,11 @@ func (cc CryptoConfig) Verify() bool {
 				return false
 			}
 		}
+		// check optional overcommit limit
+		if s.Overcommit > 0 {
+			log.Printf("%s Optional overcommit limit %d specified in config set\n",
+					prestr, s.Overcommit)
+		}
 		// check APQNDefs
 		for k, a := range s.APQNDefs {
 			// check APQN adapter value
@@ -206,6 +212,9 @@ func (cc CryptoConfig) PrettyLog() {
 		}
 		if len(e.MinCexGen) > 0 {
 			log.Printf("    mincexgen: '%s'\n", e.MinCexGen)
+		}
+		if e.Overcommit > 0 {
+			log.Printf("    overcommit: %d\n", e.Overcommit)
 		}
 		n = len(e.APQNDefs)
 		if n > 0 {
@@ -269,8 +278,8 @@ func (cc *CryptoConfig) GetCryptoConfigSetForThisAPQN(ap, dom int, machineid str
 }
 
 func (s CryptoConfigSet) String() string {
-	return fmt.Sprintf("Set(setname=%s,project=%s,cexmode=%s,mincexgen=%s,apqndefs=%s)",
-		s.SetName, s.Project, s.CexMode, s.MinCexGen, s.APQNDefs)
+	return fmt.Sprintf("Set(setname=%s,project=%s,cexmode=%s,mincexgen=%s,overcommit=%d,apqndefs=%s)",
+		s.SetName, s.Project, s.CexMode, s.MinCexGen, s.Overcommit, s.APQNDefs)
 }
 
 func (s CryptoConfigSet) equal(o *CryptoConfigSet) bool {
@@ -279,6 +288,7 @@ func (s CryptoConfigSet) equal(o *CryptoConfigSet) bool {
 		s.Project != o.Project ||
 		s.CexMode != o.CexMode ||
 		s.MinCexGen != o.MinCexGen ||
+		s.Overcommit != o.Overcommit ||
 		len(s.APQNDefs) != len(o.APQNDefs) {
 		return false
 	}
