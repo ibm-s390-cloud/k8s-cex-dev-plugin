@@ -43,6 +43,7 @@
 </chapter>
 <ibmbackmatter>
 <topicref href="appendix.md" format="markdown"/>
+<topicref href="additional_resources.md" format="markdown"/>
 <notices href="notices.md" navtitle="Notices" format="markdown">
 <topicref href="notices.md#trademarks" navtitle="Trademarks" format="markdown"/>
 </notices>
