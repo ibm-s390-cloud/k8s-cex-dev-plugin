@@ -16,10 +16,11 @@ spec:
       tolerations:
       - key: CriticalAddonsOnly
         operator: Exists
-      # This Initcontainer does the settings for Selinux so that the plugin can
-      # provide and modify a tmp filesystem to tweak some sysfs entries for the
-      # container using cex crypto resources. The initcontainer is not needed
-      # if the worker nodes have Selinux not enabled.
+      # This Init Container defines settings for SELinux to enable the plug-in
+      # to provide and modify a temporary file system. The file system can be
+      # used to modify some sysfs entries for the container that uses CEX crypto
+      # resources.  If the compute nodes do not have SELinux enabled, the Init
+      # Container is not needed.
       initContainers:
       - name: shadowsysfs
         image: 'registry.access.redhat.com/ubi8/ubi-minimal'
