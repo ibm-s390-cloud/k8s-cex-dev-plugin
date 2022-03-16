@@ -138,6 +138,11 @@ func (p *ZCryptoResPlugin) filterAPQNs(ccset *CryptoConfigSet, apqnlist APQNList
 			if len(c.MachineId) > 0 && p.lister.machineid != c.MachineId {
 				continue
 			}
+			if len(ccset.MinCexGen) > 0 && a.Gen < ccset.MinCexGen {
+				log.Printf("Plugin['%s']: APQN (%d,%d) not announced. Card generation = %s, but %s or higher required for this config set\n",
+					p.resource, a.Adapter, a.Domain, a.Gen, ccset.MinCexGen)
+				continue
+			}
 			apqns = append(apqns, a)
 		}
 	}

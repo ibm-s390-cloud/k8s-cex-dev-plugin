@@ -147,7 +147,7 @@ func (cc CryptoConfig) Verify() bool {
 		}
 		// check mincexgen
 		if len(s.MinCexGen) > 0 {
-			match, _ := regexp.MatchString("cex[56789]", s.MinCexGen)
+			match, _ := regexp.MatchString("cex[456789]", s.MinCexGen)
 			if !match {
 				log.Printf("%s Unknown/unsupported mincexgen '%s'\n", prestr, s.MinCexGen)
 				return false

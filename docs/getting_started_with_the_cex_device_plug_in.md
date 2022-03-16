@@ -81,12 +81,12 @@ set comprises the following entries:
   by the CEX device plug-in. All APQNs of the configuration set must match the
   specified CEX mode. On mismatches, the CEX device plug-in creates a log entry
   and discards the use of this APQN for the configuration set.
-  <!-- JS working on implementation for v1.1 - `mincexgen`: optional, specifies the minimum CEX card generation for the
-  configuation set. If specified, must match to `cex[4-7]`.
+- `mincexgen`: optional, specifies the minimum CEX card generation for the
+  configuation set. If specified, must match to `cex[4-9]`.
   Adds an extra verification step every time the APQNs on each compute node are
   screened. All APQNs of the configuration set are checked to have at least the
   specified CEX card generation. On mismatches, the CEX device plug-in creates a
-  log entry and discards the use of the APQN for the configuration set.TODO for v1.1 -->
+  log entry and discards the use of the APQN for the configuration set.
 - `overcommit`: optional, specifies the overcommit limit for resources in
   this ConfigSet. If the parameter is omitted, it defaults to the value
   specified through the environment variable APQN_OVERCOMMIT_LIMIT. If the environment
