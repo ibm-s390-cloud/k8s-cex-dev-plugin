@@ -32,7 +32,7 @@ spec:
           - name: vartmp
             mountPath: /var/tmp
       containers:
-      - image: 'quay.io/ibm/ibm-cex-plugin-cm:v1.0.0'
+      - image: 'quay.io/ibm/ibm-cex-plugin-cm:v1.0.2'
         imagePullPolicy: Always
         name: cex-plugin
         securityContext:

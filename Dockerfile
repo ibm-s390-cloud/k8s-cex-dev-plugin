@@ -54,7 +54,7 @@ COPY LICENSE license
 WORKDIR /work
 COPY --from=build /build/cex-plugin ./
 
-LABEL name="cex-plugin-v1.0" \
+LABEL name="cex-plugin-v1.0.2" \
       description="A Kubernetes device plugin for s390 supporting CEX crypto cards" \
       description="Kubernetes device plug-in for IBM CryptoExpress (CEX) cards for for IBM Z and LinuxONE (s390x)" \
       summary="Kubernetes device plug-in for IBM CryptoExpress (CEX) cards for for IBM Z and LinuxONE (s390x)" \
