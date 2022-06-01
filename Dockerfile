@@ -20,7 +20,6 @@ FROM golang:1.14 as build
 
 # define build arguments, as buildah needs them after the FROM
 ARG VERSION
-ARG RELEASE
 ARG GIT_URL
 ARG GIT_COMMIT
 
@@ -47,6 +46,7 @@ ARG VERSION
 ARG RELEASE
 ARG GIT_URL
 ARG GIT_COMMIT
+ARG LABELNAME
 
 WORKDIR /licenses
 COPY LICENSE license
@@ -54,8 +54,7 @@ COPY LICENSE license
 WORKDIR /work
 COPY --from=build /build/cex-plugin ./
 
-LABEL name="cex-plugin-v1.0.2" \
-      description="A Kubernetes device plugin for s390 supporting CEX crypto cards" \
+LABEL name="${LABELNAME}" \
       description="Kubernetes device plug-in for IBM CryptoExpress (CEX) cards for for IBM Z and LinuxONE (s390x)" \
       summary="Kubernetes device plug-in for IBM CryptoExpress (CEX) cards for for IBM Z and LinuxONE (s390x)" \
       maintainer="IBM" \
