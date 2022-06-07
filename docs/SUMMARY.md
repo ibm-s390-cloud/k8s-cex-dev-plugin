@@ -28,6 +28,8 @@ Crypto Express (CEX) cards available for IBM Z and LinuxONE (s390x).
     * [SELinux and the Init Container](technical_concepts_limitations.md#selinux-and-the-init-container)
     * [Limitations](technical_concepts_limitations.md#limitations)
       * [Namespaces and the project field](technical_concepts_limitations.md#namespaces-and-the-project-field)
+  * [Troubleshooting](troubleshooting.md)
+    * [Capturing debug data for support](troubleshooting.md#capturing-debug-data-for-support)
   * [Appendix](appendix.md)
     * [Sample CEX resource configuration map](appendix.md#sample-cex-resource-configuration-map)
     * [Sample CEX device plug-in daemonset yaml](appendix.md#sample-cex-device-plug-in-daemonset-yaml)
