@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 IBM Corp.
+ * Copyright 2021-2022 IBM Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"k8s.io/apimachinery/pkg/util/validation"
 )
 
 const (
@@ -122,6 +124,14 @@ func (cc CryptoConfig) Verify() bool {
 
 	for i, s := range cc.CryptoConfigSets {
 		prestr := "CryptoConfig verify:"
+		// check setname - needs to be a valid qualified name
+		if errs := validation.IsQualifiedName(s.SetName); len(errs) > 0 {
+			log.Printf("%s Set name '%s' not a valid qualified name:\n", prestr, s.SetName)
+			for _, errstr := range errs {
+				log.Println(errstr)
+			}
+			return false
+		}
 		// check setnames - need to be unique
 		for j, s2 := range cc.CryptoConfigSets {
 			if i != j && s.SetName == s2.SetName {
@@ -129,7 +139,7 @@ func (cc CryptoConfig) Verify() bool {
 				return false
 			}
 		}
-		prestr = fmt.Sprintf("CryotoConfigSet '%s' verify:", s.SetName)
+		prestr = fmt.Sprintf("CrpytoConfigSet '%s' verify:", s.SetName)
 		// check projectname - must not be empty
 		if len(s.Project) == 0 {
 			log.Printf("%s Projectname is empty\n", prestr)
@@ -147,7 +157,7 @@ func (cc CryptoConfig) Verify() bool {
 		}
 		// check mincexgen
 		if len(s.MinCexGen) > 0 {
-			match, _ := regexp.MatchString("cex[456789]", s.MinCexGen)
+			match, _ := regexp.MatchString("^cex[456789]$", s.MinCexGen)
 			if !match {
 				log.Printf("%s Unknown/unsupported mincexgen '%s'\n", prestr, s.MinCexGen)
 				return false
