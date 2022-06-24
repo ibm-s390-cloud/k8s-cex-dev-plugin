@@ -3,7 +3,7 @@
 Version 1.0 of the Kubernetes device plug-in for IBM Crypto Express (CEX) cards is the initial release of this new plug-in.
 It provides containerized applications access to IBM Crypto Express (CEX) cards on IBM Z® and IBM LinuxONE (s390).
 
-## Features
+### Features
 
 The following features are included in the initial release:
 
@@ -13,7 +13,18 @@ The following features are included in the initial release:
 * Overcommitment of CEX Resources
 * Hot plug and hot unplug of APQNS
 
-## Known issues
+# Version 1.0.2 release notes
+
+Version 1.0.2 of the Kubernetes device plug-in for IBM Crypto Express (CEX) cards is mainly a bugfix update.
+The code has been rebuild with updated libraries because of a CVE finding [https://nvd.nist.gov/vuln/detail/CVE-2021-3121](https://nvd.nist.gov/vuln/detail/CVE-2021-3121) in the protobuf package [http://github.com/gogo/protobuf](http://github.com/gogo/protobuf).
+
+### Features
+
+This update includes one feature:
+
+* The OVERCOMMIT limit can be specified per configset with an `overcommit:` field.
+
+# Known issues
 
 There are no known issues. See [Limitations](technical_concepts_limitations.md#limitations) for the list of current limitations.
 
