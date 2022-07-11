@@ -5,23 +5,26 @@ This section provides information on diagnostics and troubleshooting.
 If you experience issues with the CEX device plug-in, you can check
 the pod status, gather pod diagnostics, and collect debugging data.
 
-### Prerequisites
+## Prerequisites
 
 You must log in as a user that belongs to a role with administrative privileges for the cluster.
 For example, `system:admin` or `kube:admin`.
 
+## Verification
+
 The CEX device plug-in runs as a daemonset in namespace
-`kube-system`. This query should list the CEX device plug-in
-daemonset:
+`kube-system`. 
+
+The following query should list the CEX device plug-in daemonset:
 
     $ kubectl get daemonsets -n kube-system
     NAME                   DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
     cex-plugin-daemonset   3         3         3       3            3           <none>          4d
 
 The daemonset is realized as a pod with one container per each compute
-node. The following command should list the pods of the CEX device
-plug-in, and maybe other pods running in the kube-system namespace as
-well:
+node. 
+
+To review the status of pods running in the CEX device plug-in and the kube-system namespace, run the following command:
 
     $ kubectl get pods -n kube-system
     NAME                         READY   STATUS    RESTARTS   AGE
@@ -30,16 +33,17 @@ well:
     cex-plugin-daemonset-bntsp   1/1     Running   0          3d23h
 
 Verify that the pods are running correctly. There should be one pod
-per each compute node in state `Running`. If one or more of the CEX
-device plug-in pods do not show up or are not showing a Running
-status, you can collect diagnostic information. To inspect the status
-of a pod in detail, use the `describe` subcommand, for example:
+per each compute node in status `Running`. If one or more of the CEX
+device plug-in pods do not show up or are not showing a `Running`
+status, you can collect diagnostic information. 
+
+To inspect the status of a pod in detail, use the `describe` subcommand, for example:
 
     $ kubectl describe pod cex-plugin-daemonset-bfxt2 -n kube-system
 
 When these requirements are fulfilled, ensure that you have a CEX
 resource configuration map, which defines the *CEX config sets*
-deployed in namespace `kube-system`.
+deployed in namespace `kube-system`:
 
     $ kubectl get configmap -n kube-system
     NAME                                 DATA   AGE
@@ -47,9 +51,8 @@ deployed in namespace `kube-system`.
     cex-resources-config                 1      4d2h
     ...                                  ...    ...
 
-When there is no configmap deployed a `kubectl describe` on one of the
-CEX devie plug-in pods will show a message that the volume mount
-failed, about like this:
+To verify if a configmap has been deployed, run kubectl describe on one of the
+plug-in pods. If no configmap is deployed the output will show a message that the volume mount failed, for example:
 
     MountVolume.SetUp failed for volume "cex-resources-conf" : configmap "cex-resources-config" not found
 
@@ -82,8 +85,8 @@ compute node:
 
 Each CEX device plug-in pod provides log messages, which provide
 details that might explain a possible failure or misbehavior. The logs
-of each of the CEX device plug-in instances may be extracted with a
-command sequence like this:
+of each of the CEX device plug-in instances can be extracted with the following
+command sequence:
 
     $ kubectl get pods -n kube-system --no-headers | grep cex-plugin-daemonset
     cex-plugin-daemonset-p5j8h   1/1   Running   0     32m
@@ -185,7 +188,7 @@ CEX resources is listed:
     ...
 
 When containers terminate with an allocated CEX resource there is a
-cleanup step which is reported in the log like this:
+cleanup step, which is reported in the log as follows:
 
     ...
     90: 2022/06/07 14:52:18 PodLister: 1 active zcrypt nodes
@@ -201,7 +204,7 @@ cleanup step which is reported in the log like this:
 If you submit a support case, provide debugging data. Describe the
 failure and the expected behavior and collect the logs of **all** CEX
 device plug-in instances together with the **currently active** CEX
-resource configuration map. Optionally you can include the output of
+resource configuration map. Optionally, you can include the output of
 `kubectl describe nodes`. Be careful when providing this node data as
 internals of the load on the cluster might be exposed.
 
@@ -218,8 +221,8 @@ information:
 
 Note: The CEX device plug-in does not have access to any cluster or
 application secrets. Therefore, only administrative information,
-related to the APQNs that are managed by the plug-in is logged. The
+related to the APQNs that are managed by the plug-in, is logged. The
 logs contain the name of the configuration sets and the name and
 namespace of pods that request and use APQNs. Since no application,
 cluster, or company secrets are contained within the logs, it is safe
-to hand over this logging information to the technical support.
+to hand over this logging information to technical support.
