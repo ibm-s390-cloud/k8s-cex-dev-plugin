@@ -31,35 +31,34 @@ GIT_URL := $(shell $(PWD)/version.sh --git-url)
 GIT_COMMIT := $(shell $(PWD)/version.sh --git-commit)
 
 .PHONY: build
-build:
+build:	build-cex-device-plugin-image
+
+.PHONY: build-cex-device-plugin-image
+build-cex-device-plugin-image:
+	cd src/cex-device-plugin && \
 	$(RUNTIME) build -f Dockerfile -t $(IMAGE) --build-arg VERSION=$(VERSION) \
 	    --build-arg RELEASE=$(RELEASE) --build-arg GIT_URL=$(GIT_URL) \
 	    --build-arg GIT_COMMIT=$(GIT_COMMIT) --build-arg LABELNAME=$(LABELNAME) .
 
-.PHONY: buildah
-buildah:
-
+.PHONY: buildah-cex-device-plugin-image
+buildah-cex-device-plugin-image:
+	cd src/cex-device-plugin && \
 	buildah bud -f Dockerfile -t $(IMAGE) --build-arg VERSION=$(VERSION) \
 	    --build-arg RELEASE=$(RELEASE) --build-arg GIT_URL=$(GIT_URL) \
 	    --build-arg GIT_COMMIT=$(GIT_COMMIT) --build-arg LABELNAME=$(LABELNAME) .
 
-
-.PHONY: push
-push:
+.PHONY: push-image
+push-image:
 	if test -n "$(REGISTRY)"; then \
 		$(RUNTIME) push $(IMAGE); \
 	fi
 
-.PHONY: tag-latest
-tag-latest:
+.PHONY: tag-latest-image
+tag-latest-image:
 	$(RUNTIME) tag $(IMAGE) $(IMAGE_LATEST)
 
-.PHONY: push-latest
-push-latest:
+.PHONY: push-latest-image
+push-latest-image:
 	if test -n "$(REGISTRY)"; then \
 		$(RUNTIME) push $(IMAGE_LATEST); \
 	fi
-
-.PHONY: show-tag
-show-tag:
-	@echo $(TAG)
