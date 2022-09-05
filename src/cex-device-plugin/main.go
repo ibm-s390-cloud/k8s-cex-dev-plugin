@@ -24,6 +24,7 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 )
 
 var (
@@ -36,6 +37,8 @@ var (
 
 func main() {
 
+	versionarg := flag.Bool("version", false, "Print version and exit")
+
 	// workaround for log: exiting because of error: log cannot create log: open ...
 	flag.Set("logtostderr", "true")
 	flag.Parse()
@@ -44,6 +47,11 @@ func main() {
 	log.Printf("Plugin Version: %s\n", version)
 	log.Printf("Git URL:        %s\n", git_url)
 	log.Printf("Git Commit:     %s\n", git_commit)
+
+	// exit if only version was requested
+	if *versionarg {
+		os.Exit(0)
+	}
 
 	// check for AP bus support and machine id fetchable or die
 	if !apHasApSupport() {
