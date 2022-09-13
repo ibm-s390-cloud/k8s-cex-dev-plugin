@@ -1,7 +1,7 @@
 # Introduction {: #introduction}
 
-This Kubernetes device plug-in provides access to IBM s390 Crypto Express (CEX)
-cards for s390 Kubernetes container loads. Throughout this publication, the term
+This Kubernetes device plug-in provides access to IBM Crypto Express (CEX)
+cards for containers running on IBM Z and LinuxONE. Throughout this publication, the term
 'CEX device plug-in' is used to refer to this Kubernetes device plug-in.
 
 
@@ -10,7 +10,7 @@ cards for s390 Kubernetes container loads. Throughout this publication, the term
 The Kubernetes CEX device plug-in provides IBM Crypto Express cards to be made
 available on Kubernetes nodes for use by containers.
 
-The CEX device plug-in version 1 groups the available CEX resources (*APQNs*)
+The CEX device plug-in groups the available CEX resources (*APQNs*)
 into *CEX config sets*. Containers can request **one** resource from **one**
 *CEX config set*. Thus, from a container perspective, the APQNs within one *CEX config set* should be equivalent, which means that each APQN can be used interchangeably for any crypto workload.
 
