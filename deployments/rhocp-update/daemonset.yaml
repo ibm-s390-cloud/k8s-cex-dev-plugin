@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cex-plugin-daemonset
+  namespace: cex-device-plugin
+spec:
+  template:
+    spec:
+      # This Init Container defines settings for SELinux to enable the plug-in
+      # to provide and modify a temporary file system. The file system can be
+      # used to modify some sysfs entries for the container that uses CEX crypto
+      # resources.  If the compute nodes do not have SELinux enabled, the Init
+      # Container is not needed.
+      initContainers:
+      - name: shadowsysfs
+        image: 'registry.redhat.io/ubi8-minimal'
+        command: ["/bin/sh"]
+        args: ["-c", "mkdir -p -m 0755 /var/tmp/shadowsysfs && chcon -t container_file_t /var/tmp/shadowsysfs"]
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - name: vartmp
+            mountPath: /var/tmp

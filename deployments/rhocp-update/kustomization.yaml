@@ -1,0 +1,10 @@
+bases:
+- ../k8s-update
+patchesStrategicMerge:
+- namespace.yaml
+- daemonset.yaml
+resources:
+- sccuse.yaml
+images:
+- name: 'quay.io/ibm/ibm-cex-plugin-cm'
+  newName: 'registry.connect.redhat.com/ibm/ibm-cex-device-plugin-cm'

@@ -1,0 +1,8 @@
+configMapGenerator:
+- name: cex-resources-config
+  namespace: cex-device-plugin
+  behavior: create
+  files:
+  - cex_resources.json
+generatorOptions:
+  disableNameSuffixHash: true
