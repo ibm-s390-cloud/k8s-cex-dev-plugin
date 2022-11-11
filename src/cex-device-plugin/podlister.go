@@ -41,10 +41,18 @@ const (
 )
 
 var (
-	plPollTime                    = time.Duration(getenvint("PODLISTER_POLL_INTERVAL", 30, 10)) // every plPollTime fetch and process the pod resources
+	PlPollTime                    = time.Duration(getenvint("PODLISTER_POLL_INTERVAL", 30, 10)) // every plPollTime fetch and process the pod resources
 	DeleteResourceTimeoutIfUnused = int64(getenvint("RESOURCE_DELETE_NEVER_USED", 1800, 30))    // delete never used resources after 30min
 	DeleteResourceTimeoutAfterUse = int64(getenvint("RESOURCE_DELETE_UNUSED", 120, 30))         // delete not any more used resources after 2 min
 )
+
+func getenvstr(envvar, defaultval string) string {
+	valstr, isset := os.LookupEnv(envvar)
+	if isset {
+		return valstr
+	}
+	return defaultval
+}
 
 func getenvint(envvar string, defaultval, minval int) int {
 	valstr, isset := os.LookupEnv(envvar)
@@ -142,7 +150,7 @@ func (pl *PodLister) podListerLoop() {
 
 	var err error
 
-	tick := time.NewTicker(plPollTime * time.Second)
+	tick := time.NewTicker(PlPollTime * time.Second)
 
 ForLoop:
 	for {
@@ -268,6 +276,7 @@ func (pl *PodLister) doLoop() error {
 							log.Printf("PodLister: Container '%s' in namespace %s uses CEX resource '%s'\n",
 								c.Name, pod.Namespace, id)
 						}
+						MetricsCollNotifyAboutRunningContainer(ccset.SetName, id)
 					}
 
 					conswithplugindevs++
@@ -303,6 +312,7 @@ func (pl *PodLister) doLoop() error {
 				// within DeleteResourceTimeoutIfUnused s never seen a container using this
 				log.Printf("PodLister: deleting zcrypt node '%s': no container ever used it since %d s\n",
 					zk, DeleteResourceTimeoutIfUnused)
+				pl.tellMetricsCollAboutDestroyNode(zk)
 				zcryptDestroyNode(zk)
 				delete(zcryptnodemap, zk)
 			}
@@ -312,6 +322,7 @@ func (pl *PodLister) doLoop() error {
 				// container using this has not been seen for DeleteResourceTimeoutAfterUse s
 				log.Printf("PodLister: deleting zcrypt node '%s': no container use since %d s\n",
 					zk, DeleteResourceTimeoutAfterUse)
+				pl.tellMetricsCollAboutDestroyNode(zk)
 				zcryptDestroyNode(zk)
 				delete(zcryptnodemap, zk)
 			}
@@ -342,4 +353,12 @@ func (pl *PodLister) doLoop() error {
 	}
 
 	return nil
+}
+
+func (pl *PodLister) tellMetricsCollAboutDestroyNode(zcryptnode string) {
+
+	if strings.HasPrefix(zcryptnode, "zcrypt-") {
+		dev := zcryptnode[7:]
+		MetricsCollNotifyAboutDestroyNode(dev)
+	}
 }

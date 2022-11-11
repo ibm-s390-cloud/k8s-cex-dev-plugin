@@ -28,8 +28,8 @@ import (
 )
 
 var (
-	version = "development"
-	git_url = "https://github.com/ibm-s390-cloud/k8s-cex-dev-plugin.git"
+	version    = "development"
+	git_url    = "https://github.com/ibm-s390-cloud/k8s-cex-dev-plugin.git"
 	git_commit = "unknown"
 
 	MachineId = ""
@@ -95,8 +95,17 @@ func main() {
 		log.Fatalf("Main: PodLister Start failed: %s\n", err)
 	}
 
+	// start metrics collector or die
+	mc := NewMetricsCollector()
+	if err = mc.Start(); err != nil {
+		log.Fatalf("Main: MetricsCollector Start failed: %s\n", err)
+	}
+
 	// enter the crypto resources plugins loop
 	RunZCryptoResPlugins()
+
+	// stop metrics collector
+	mc.Stop()
 
 	// stop pod lister
 	pl.Stop()

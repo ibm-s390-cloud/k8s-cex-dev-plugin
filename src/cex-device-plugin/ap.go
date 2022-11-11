@@ -246,3 +246,20 @@ func apEqualAPQNLists(l1, l2 APQNList) bool {
 
 	return true
 }
+
+func apGetQueueRequestCounter(ap, dom int) (int, error) {
+
+	sysfsqueuedir := fmt.Sprintf("%s/card%02x/%02x.%04x", apsysfsdevsdir, ap, ap, dom)
+	rcountstr, err := apReadFirstLineFromFile(sysfsqueuedir + "/request_count")
+	if err != nil {
+		log.Printf("Ap: Error reading 'request_count' file from queue %02x.%04x: %s\n", ap, dom, err)
+		return 0, fmt.Errorf("Ap: Error reading 'request_count' file from queue %02x.%04x: %w\n", ap, dom, err)
+	}
+	var rcounter int
+	if _, err = fmt.Sscanf(rcountstr, "%d", &rcounter); err != nil {
+		log.Printf("Ap: Error parsing 'request_count' file from queue %02x.%04x: %s\n", ap, dom, err)
+		return 0, fmt.Errorf("Ap: Error parsing 'request_count' file from queue %02x.%04x: %w\n", ap, dom, err)
+	}
+
+	return rcounter, nil
+}

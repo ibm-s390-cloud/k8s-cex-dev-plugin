@@ -31,7 +31,8 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # Copy the code into the build dir
-COPY ap.go cryptoconfigs.go main.go plugin.go podlister.go shadowsysfs.go zcrypt.go ./
+COPY ap.go cryptoconfigs.go main.go plugin.go podlister.go \
+     shadowsysfs.go zcrypt.go metricscollector.go ./
 
 # Build the application
 RUN CGO_ENABLED=0 GO111MODULE=on go build -v -o cex-plugin \

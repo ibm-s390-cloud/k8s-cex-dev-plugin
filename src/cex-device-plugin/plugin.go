@@ -208,9 +208,11 @@ func (p *ZCryptoResPlugin) checkChanged() bool {
 	if apqnsChanged || configChanged {
 		p.ccset, p.tag = ccset, tag
 		p.apqns = apqns
+		p.tellMetricsCollAboutAPQNs()
 		p.devices = p.makePluginDevsFromAPQNs()
 		log.Printf("Plugin['%s']: Derived %d plugin devices from the list of APQNs\n",
 			p.resource, len(p.devices))
+		p.tellMetricsCollAboutPluginDevs()
 		return true
 	} else {
 		log.Printf("Plugin['%s']: no changes\n", p.resource)
@@ -248,10 +250,12 @@ func (p *ZCryptoResPlugin) Start() error {
 
 	p.apqns = p.filterAPQNs(p.ccset, allnodeapqns)
 	log.Printf("Plugin['%s']: Found %d eligible APQNs: %s\n", p.resource, len(p.apqns), p.apqns)
+	p.tellMetricsCollAboutAPQNs()
 
 	p.devices = p.makePluginDevsFromAPQNs()
 	log.Printf("Plugin['%s']: Derived %d plugin devices from the list of APQNs\n",
 		p.resource, len(p.devices))
+	p.tellMetricsCollAboutPluginDevs()
 
 	p.stopChan = make(chan struct{})
 	p.changedChan = make(chan struct{})
@@ -358,6 +362,7 @@ func (p *ZCryptoResPlugin) Allocate(ctx context.Context, req *kdp.AllocateReques
 				ContainerPath: "/sys/devices/ap",
 				HostPath:      apdevsdir,
 				ReadOnly:      true})
+			p.tellMetricsCollAboutAlloc(id)
 			// only one device per container supported
 			break
 		}
@@ -388,4 +393,24 @@ func RunZCryptoResPlugins() {
 
 	mgr := dpm.NewManager(lister)
 	mgr.Run()
+}
+
+func (p *ZCryptoResPlugin) tellMetricsCollAboutAPQNs() {
+	MetricsCollAPQNs(p.resource, p.apqns)
+}
+
+func (p *ZCryptoResPlugin) tellMetricsCollAboutPluginDevs() {
+
+	var devs []string
+
+	for _, dev := range p.devices {
+		if dev.Health == kdp.Healthy {
+			devs = append(devs, dev.ID)
+		}
+	}
+	MetricsCollPluginDevs(p.resource, devs)
+}
+
+func (p *ZCryptoResPlugin) tellMetricsCollAboutAlloc(zdevnode string) {
+	MetricsCollNotifyAboutAlloc(p.resource, zdevnode)
 }
