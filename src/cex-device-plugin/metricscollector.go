@@ -430,10 +430,6 @@ func (mc *MetricsCollector) sendDataToPromExp(senddata *pe_data_s) bool {
 		return false
 	}
 	str := strings.TrimSpace(string(buf[:i]))
-	if len(str) < 1 {
-		log.Printf("MetricsColl: Connection received invalid reply\n")
-		return false
-	}
 	if str != "ok" {
 		log.Printf("MetricsColl: Connection received invalid reply '%s'\n", str)
 		return false
