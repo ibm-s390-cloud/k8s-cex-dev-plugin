@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: cex-plugin-daemonset
-  namespace: kube-system
+  namespace: cex-device-plugin
 spec:
   selector:
     matchLabels:
@@ -13,6 +13,8 @@ spec:
         name: cex-plugin
     spec:
       priorityClassName: system-cluster-critical
+      serviceAccount: cex-plugin-sa
+      serviceAccountName: cex-plugin-sa
       tolerations:
       - key: CriticalAddonsOnly
         operator: Exists
@@ -32,9 +34,9 @@ spec:
           - name: vartmp
             mountPath: /var/tmp
       containers:
-      - image: 'quay.io/ibm/ibm-cex-plugin-cm:v1.0.2'
+      - name: cex-plugin
+        image: 'quay.io/ibm/ibm-cex-plugin-cm:v1.0.2'
         imagePullPolicy: Always
-        name: cex-plugin
         securityContext:
           privileged: true
         env:
