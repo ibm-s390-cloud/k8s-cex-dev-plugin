@@ -55,8 +55,8 @@ WORKDIR /work
 COPY --from=build /build/cex-plugin ./
 
 LABEL name="${LABELNAME}" \
-      description="Kubernetes device plug-in for IBM CryptoExpress (CEX) cards for IBM Z and LinuxONE (s390x)" \
-      summary="Kubernetes device plug-in for IBM CryptoExpress (CEX) cards for IBM Z and LinuxONE (s390x)" \
+      description="Kubernetes device plug-in for IBM CryptoExpress (CEX) cards for for IBM zSystems and LinuxONE (s390x)" \
+      summary="Kubernetes device plug-in for IBM CryptoExpress (CEX) cards for for IBM zSystems and LinuxONE (s390x)" \
       maintainer="IBM" \
       vendor="IBM" \
       version="${VERSION}" \
