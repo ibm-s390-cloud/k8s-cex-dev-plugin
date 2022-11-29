@@ -98,7 +98,7 @@ func (pl *PodLister) connect() error {
 	con, err := dial(pl.socket, plConTimeout*time.Second)
 	if err != nil {
 		log.Printf("PodLister: Socket connection to '%s' failed: %s\n", pl.socket, err)
-		return fmt.Errorf("PodLister: Can't establish connection to '%s': %s\n", pl.socket, err)
+		return fmt.Errorf("PodLister: Can't establish connection to '%s': %s", pl.socket, err)
 	}
 
 	client := podresapi.NewPodResourcesListerClient(con)
@@ -106,7 +106,7 @@ func (pl *PodLister) connect() error {
 		pl.con.Close()
 		pl.con = nil
 		log.Printf("PodLister: NewPodResourcesListerClient() returned nil\n")
-		return fmt.Errorf("PodLister: Can't construct pod lister client\n")
+		return fmt.Errorf("PodLister: Can't construct pod lister client")
 	}
 
 	pl.con = con
@@ -122,7 +122,7 @@ func (pl *PodLister) Start() error {
 	err := pl.connect()
 	if err != nil {
 		log.Printf("PodLister: Unable to construct pod lister client\n")
-		return fmt.Errorf("PodLister: Unable to construct pod lister client\n")
+		return fmt.Errorf("PodLister: Unable to construct pod lister client")
 	}
 
 	go pl.podListerLoop()
@@ -177,7 +177,7 @@ func (pl *PodLister) doLoop() error {
 
 	if pl.con == nil {
 		log.Printf("PodLister: No connection to kubelet\n")
-		return fmt.Errorf("PodLister: No connection to kubelet\n")
+		return fmt.Errorf("PodLister: No connection to kubelet")
 	}
 
 	// update zcryptnodemap with maybe new active zcrypt nodes
@@ -217,7 +217,7 @@ func (pl *PodLister) doLoop() error {
 	resp, err := pl.client.List(context.TODO(), &req)
 	if err != nil {
 		log.Printf("PodLister: List() on PodResourcesListerClient failed: %s\n", err)
-		return fmt.Errorf("PodLister: List() on PodResourcesListerClient failed: %s\n", err)
+		return fmt.Errorf("PodLister: List() on PodResourcesListerClient failed: %s", err)
 	}
 
 	/* for debugging:

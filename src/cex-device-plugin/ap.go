@@ -110,7 +110,7 @@ func apScanQueueDir(carddir, queuedir string) (*APQN, error) {
 	online, err := apReadFirstLineFromFile(apsysfsdevsdir + "/" + carddir + "/" + queuedir + "/" + "online")
 	if err != nil {
 		log.Printf("Ap: Error reading 'online' file from queuedir '%s': %s\n", carddir, err)
-		return nil, fmt.Errorf("Ap: Error reading 'online' file from queuedir '%s': %w\n", carddir, err)
+		return nil, fmt.Errorf("Ap: Error reading 'online' file from queuedir '%s': %w", carddir, err)
 	}
 
 	a := new(APQN)
@@ -131,18 +131,18 @@ func apScanCardDir(carddir string) (APQNList, error) {
 	files, err := ioutil.ReadDir(apsysfsdevsdir + "/" + carddir)
 	if err != nil {
 		log.Printf("Ap: Error reading card directory '%s': %s\n", carddir, err)
-		return nil, fmt.Errorf("Ap: Error reading card directory '%s': %w\n", carddir, err)
+		return nil, fmt.Errorf("Ap: Error reading card directory '%s': %w", carddir, err)
 	}
 
 	cardtype, err := apReadFirstLineFromFile(apsysfsdevsdir + "/" + carddir + "/" + "type")
 	if err != nil {
 		log.Printf("Ap: Error reading 'type' file from card directory '%s': %s\n", carddir, err)
-		return nil, fmt.Errorf("Ap: Error reading 'type' file from card directory '%s': %w\n", carddir, err)
+		return nil, fmt.Errorf("Ap: Error reading 'type' file from card directory '%s': %w", carddir, err)
 	}
 	match, _ := regexp.MatchString("CEX[[:digit:]]+[ACP]", cardtype)
 	if !match {
 		log.Printf("Ap: Error matching cardtype '%s' from card directory '%s'\n", cardtype, carddir)
-		return nil, fmt.Errorf("Ap: Error matching cardtype '%s' from card directory '%s'\n", cardtype, carddir)
+		return nil, fmt.Errorf("Ap: Error matching cardtype '%s' from card directory '%s'", cardtype, carddir)
 	}
 	var cardgen int
 	var cardmode byte

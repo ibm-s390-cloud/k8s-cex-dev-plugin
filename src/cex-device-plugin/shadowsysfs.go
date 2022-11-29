@@ -121,7 +121,7 @@ func makeShadowApSysfs(id string, adapter, domain int) (string, string, error) {
 		err := os.MkdirAll(dirname, 0755)
 		if err != nil {
 			log.Printf("Shadowsysfs: failed to create shadow sysfs dir %s: %s\n", dirname, err)
-			return fmt.Errorf("Shadowsysfs: Failed to create shadow sysfs dir %s: %s\n", dirname, err)
+			return fmt.Errorf("Shadowsysfs: Failed to create shadow sysfs dir %s: %s", dirname, err)
 		}
 		return nil
 	}
@@ -131,7 +131,7 @@ func makeShadowApSysfs(id string, adapter, domain int) (string, string, error) {
 		err := ioutil.WriteFile(filename, rawdata, 0444)
 		if err != nil {
 			log.Printf("Shadowsysfs: failed to write shadow sysfs file %s: %s\n", filename, err)
-			return fmt.Errorf("Shadowsysfs: Failed to write shadow sysfs file %s: %s\n", filename, err)
+			return fmt.Errorf("Shadowsysfs: Failed to write shadow sysfs file %s: %s", filename, err)
 		}
 		return nil
 	}
@@ -163,12 +163,12 @@ func makeShadowApSysfs(id string, adapter, domain int) (string, string, error) {
 		rawdata, err := ioutil.ReadFile(src)
 		if err != nil {
 			log.Printf("Shadowsysfs: failed to read sysfs file %s: %s\n", src, err)
-			return fmt.Errorf("Shadowsysfs: Failed to read sysfs file %s: %s\n", src, err)
+			return fmt.Errorf("Shadowsysfs: Failed to read sysfs file %s: %s", src, err)
 		}
 		err = ioutil.WriteFile(dst, rawdata, 0444)
 		if err != nil {
 			log.Printf("Shadowsysfs: failed to write shadow sysfs file %s: %s\n", dst, err)
-			return fmt.Errorf("Shadowsysfs: Failed to write shadow sysfs file %s: %s\n", dst, err)
+			return fmt.Errorf("Shadowsysfs: Failed to write shadow sysfs file %s: %s", dst, err)
 		}
 		return nil
 	}
@@ -201,7 +201,7 @@ func makeShadowApSysfs(id string, adapter, domain int) (string, string, error) {
 		err := os.Symlink(dst, src)
 		if err != nil {
 			log.Printf("Shadowsysfs: failed to create symlink %s -> %s: %s\n", src, dst, err)
-			return fmt.Errorf("Shadowsysfs: Failed to create symlink %s -> %s: %s\n", src, dst, err)
+			return fmt.Errorf("Shadowsysfs: Failed to create symlink %s -> %s: %s", src, dst, err)
 		}
 		return nil
 	}
@@ -220,7 +220,7 @@ func makeShadowApSysfs(id string, adapter, domain int) (string, string, error) {
 	_, err = os.Stat(shadowbasedir)
 	if err != nil {
 		log.Printf("Shadowsysfs: missing shadow base dir %s: %s\n", shadowbasedir, err)
-		return "", "", fmt.Errorf("Shadowsysfs: missing shadow base dir %s: %s\n", shadowbasedir, err)
+		return "", "", fmt.Errorf("Shadowsysfs: missing shadow base dir %s: %s", shadowbasedir, err)
 	}
 
 	// create shadow dir for this id
@@ -387,7 +387,7 @@ func shadowFetchActiveShadows() ([]string, error) {
 	files, err := ioutil.ReadDir(shadowbasedir)
 	if err != nil {
 		log.Printf("Shadowsysfs: Can't read directory %s: %s\n", shadowbasedir, err)
-		return nil, fmt.Errorf("Shadowsysfs: Can't read directory %s: %s\n", shadowbasedir, err)
+		return nil, fmt.Errorf("Shadowsysfs: Can't read directory %s: %s", shadowbasedir, err)
 	}
 
 	for _, f := range files {
