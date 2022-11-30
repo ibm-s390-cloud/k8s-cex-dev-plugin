@@ -36,14 +36,14 @@ import (
 )
 
 const (
-	podResSocket                  = "/var/lib/kubelet/pod-resources/kubelet.sock"
-	plConTimeout                  = 10  // connection timeout
+	podResSocket = "/var/lib/kubelet/pod-resources/kubelet.sock"
+	plConTimeout = 10 // connection timeout
 )
 
 var (
 	plPollTime                    = time.Duration(getenvint("PODLISTER_POLL_INTERVAL", 30, 10)) // every plPollTime fetch and process the pod resources
-	DeleteResourceTimeoutIfUnused = int64(getenvint("RESOURCE_DELETE_NEVER_USED", 1800, 30)) // delete never used resources after 30min
-	DeleteResourceTimeoutAfterUse = int64(getenvint("RESOURCE_DELETE_UNUSED", 120, 30)) // delete not any more used resources after 2 min
+	DeleteResourceTimeoutIfUnused = int64(getenvint("RESOURCE_DELETE_NEVER_USED", 1800, 30))    // delete never used resources after 30min
+	DeleteResourceTimeoutAfterUse = int64(getenvint("RESOURCE_DELETE_UNUSED", 120, 30))         // delete not any more used resources after 2 min
 )
 
 func getenvint(envvar string, defaultval, minval int) int {
@@ -256,18 +256,16 @@ func (pl *PodLister) doLoop() error {
 						continue
 					}
 					// find the crypto config set to which this apqn belongs
-					ccset :=  GetCurrentCryptoConfig().GetCryptoConfigSetForThisAPQN(card, queue, MachineId);
+					ccset := GetCurrentCryptoConfig().GetCryptoConfigSetForThisAPQN(card, queue, MachineId)
 					if ccset == nil {
-						log.Printf("PodLister: config set for APQN(%d,%d) not found\n", card, queue);
+						log.Printf("PodLister: config set for APQN(%d,%d) not found\n", card, queue)
 					} else {
 						// check pod namespace against config set projectname
 						if pod.Namespace != ccset.Project {
-							log.Printf("PodLister: Container '%s' in namespace '%s'" +
-								" uses CEX resource '%s' marked for project '%s'!!!\n",
-								c.Name, pod.Namespace, id, ccset.Project);
+							log.Printf("PodLister: Container '%s' in namespace '%s' uses CEX resource '%s' marked for project '%s'!!!\n",
+								c.Name, pod.Namespace, id, ccset.Project)
 						} else {
-							log.Printf("PodLister: Container '%s' in namespace %s" +
-								" uses CEX resource '%s'\n",
+							log.Printf("PodLister: Container '%s' in namespace %s uses CEX resource '%s'\n",
 								c.Name, pod.Namespace, id)
 						}
 					}
