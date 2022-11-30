@@ -34,6 +34,7 @@ import (
 
 const (
 	baseResourceName = "cex.s390.ibm.com" // base resource name
+	ApqnFmtStr       = "apqn-%d-%d-%d"    // used on several places for Sscanf and Sprintf
 )
 
 var (
@@ -167,7 +168,7 @@ func (p *ZCryptoResPlugin) makePluginDevsFromAPQNs() []*kdp.Device {
 		}
 		for i := 0; i < p.ccset.Overcommit; i++ {
 			devices = append(devices, &kdp.Device{
-				ID:     fmt.Sprintf("apqn-%d-%d-%d", a.Adapter, a.Domain, i),
+				ID:     fmt.Sprintf(ApqnFmtStr, a.Adapter, a.Domain, i),
 				Health: health,
 			})
 		}
@@ -230,7 +231,7 @@ ForLoop:
 		case <-tick.C:
 			if p.checkChanged() {
 				p.changedChan <- struct{}{}
-			} 
+			}
 		}
 	}
 }
@@ -318,13 +319,13 @@ func (p *ZCryptoResPlugin) Allocate(ctx context.Context, req *kdp.AllocateReques
 			// parse device id
 			//fmt.Printf("debug Plugin['%s']: Allocate(): Container request for device ID %v\n", p.resource, id)
 			var card, queue, overcount int
-			n, err := fmt.Sscanf(id, "apqn-%d-%d-%d", &card, &queue, &overcount)
+			n, err := fmt.Sscanf(id, ApqnFmtStr, &card, &queue, &overcount)
 			if err != nil || n < 3 {
 				log.Printf("Plugin['%s']: Error parsing device id '%s'\n", p.resource, id)
 				return nil, fmt.Errorf("Error parsing device id '%s'", id)
 			}
 			// check and maybe create a zcrypt device node
-			znode := fmt.Sprintf("zcrypt-apqn-%d-%d-%d", card, queue, overcount)
+			znode := fmt.Sprintf("zcrypt-"+ApqnFmtStr, card, queue, overcount)
 			if !zcryptNodeExists(znode) {
 				log.Printf("Plugin['%s']: creating zcrypt device node '%s'\n", p.resource, znode)
 				err = zcryptCreateSimpleNode(znode, card, queue)

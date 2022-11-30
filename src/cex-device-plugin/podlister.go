@@ -250,7 +250,7 @@ func (pl *PodLister) doLoop() error {
 						continue
 					}
 					var card, queue, overcount int
-					n, err := fmt.Sscanf(id, "apqn-%d-%d-%d", &card, &queue, &overcount)
+					n, err := fmt.Sscanf(id, ApqnFmtStr, &card, &queue, &overcount)
 					if err != nil || n < 3 {
 						log.Printf("PodLister: Error parsing device id '%s'\n", id)
 						continue
