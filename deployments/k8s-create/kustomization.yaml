@@ -1,3 +1,0 @@
-bases:
-- ../k8s-update
-- ../configmap

@@ -1,0 +1,39 @@
+Kustomize-based deployment for the IBM CEX device plugin
+========================================================
+
+This folder provides various sub-folders for different deployments
+based on kustomize overlays.  To install the IBM CEX device plugin
+with an empty config map, just run
+
+$ oc create -k rhocp-create
+
+To create a custom config map during installation, edit the file
+
+configmap/cex_resources.json
+
+It is also possible to use the configuration overlay to only deploy a
+configmap via
+
+$ oc create -k configmap
+
+or update an existing config map to a different version with
+
+$ oc apply -k configmap
+
+To update an installation without touching the configmap, simply run
+
+$ oc apply -k rhocp-update
+
+To delete everything related to the IBM CEX device plugin, run
+
+$ oc delete -k rhocp-create
+
+Note that it is not possible to delete everything except the configmap
+since it is placed in the cex-device-plugin namespace that will be
+deleted by the command above.
+
+To deploy the IBM CEX device plugin on a non RedHat OpenShift
+Container Platform cluster, please contact
+
+Harald Freudenberger <freude@linux.ibm.com>
+Juergen Christ <jchrist@linux.ibm.com>

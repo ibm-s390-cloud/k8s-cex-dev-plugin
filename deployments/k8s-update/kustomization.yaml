@@ -1,6 +1,0 @@
-resources:
-- namespace.yaml
-- serviceaccount.yaml
-- role.yaml
-- binding.yaml
-- daemonset.yaml
