@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cex-prometheus-exporter-collector-service
+  namespace: cex-device-plugin
+  labels:
+    app: cex-prometheus-exporter
+spec:
+  type: ClusterIP
+  selector:
+    app: cex-prometheus-exporter
+  ports:
+  - name: collector
+    port: 12358
+    protocol: TCP
+    targetPort: collector

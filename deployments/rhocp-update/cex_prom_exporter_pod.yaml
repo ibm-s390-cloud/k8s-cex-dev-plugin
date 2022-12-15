@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cex-prometheus-exporter
+  namespace: cex-device-plugin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cex-prometheus-exporter
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cex-prometheus-exporter
+    spec:
+      serviceAccount: cex-prometheus-exporter-sa
+      serviceAccountName: cex-prometheus-exporter-sa
+      containers:
+        - name: cex-prometheus-exporter
+          image: 'registry.connect.redhat.com/ibm/ibm-cex-device-plugin-cm:v1.0.2'
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          command: ["/work/cex-prometheus-exporter"]
+          ports:
+            - containerPort: 9939
+              name: prommetrics
+            - containerPort: 12358
+              name: collector

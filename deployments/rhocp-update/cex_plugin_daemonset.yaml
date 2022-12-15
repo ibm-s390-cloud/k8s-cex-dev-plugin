@@ -13,15 +13,33 @@ spec:
         name: cex-plugin
     spec:
       priorityClassName: system-cluster-critical
+      serviceAccount: cex-plugin-sa
+      serviceAccountName: cex-plugin-sa
       tolerations:
       - key: CriticalAddonsOnly
         operator: Exists
-      containers:
-      - image: 'registry.connect.redhat.com/ibm/ibm-cex-device-plugin-cm:v1.0.2'
-        imagePullPolicy: Always
-        name: cex-plugin
+      # This Init Container defines settings for SELinux to enable the plug-in
+      # to provide and modify a temporary file system. The file system can be
+      # used to modify some sysfs entries for the container that uses CEX crypto
+      # resources.  If the compute nodes do not have SELinux enabled, the Init
+      # Container is not needed.
+      initContainers:
+      - name: shadowsysfs
+        image: 'registry.redhat.io/ubi8-minimal'
+        command: ["/bin/sh"]
+        args: ["-c", "mkdir -p -m 0755 /var/tmp/shadowsysfs && chcon -t container_file_t /var/tmp/shadowsysfs"]
         securityContext:
           privileged: true
+        volumeMounts:
+          - name: vartmp
+            mountPath: /var/tmp
+      containers:
+      - name: cex-plugin
+        image: 'registry.connect.redhat.com/ibm/ibm-cex-device-plugin-cm:v1.0.2'
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        command: ["/work/cex-plugin"]
         env:
           # provide NODENAME to the container
           - name: NODENAME
@@ -68,20 +86,3 @@ spec:
         - name: cex-resources-conf
           configMap:
             name: cex-resources-config
-      serviceAccount: cex-plugin-sa
-      serviceAccountName: cex-plugin-sa
-      # This Init Container defines settings for SELinux to enable the plug-in
-      # to provide and modify a temporary file system. The file system can be
-      # used to modify some sysfs entries for the container that uses CEX crypto
-      # resources.  If the compute nodes do not have SELinux enabled, the Init
-      # Container is not needed.
-      initContainers:
-      - name: shadowsysfs
-        image: 'registry.redhat.io/ubi8-minimal'
-        command: ["/bin/sh"]
-        args: ["-c", "mkdir -p -m 0755 /var/tmp/shadowsysfs && chcon -t container_file_t /var/tmp/shadowsysfs"]
-        securityContext:
-          privileged: true
-        volumeMounts:
-          - name: vartmp
-            mountPath: /var/tmp
