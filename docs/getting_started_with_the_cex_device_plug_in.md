@@ -1,13 +1,18 @@
-# Getting started with the CEX device plug-in {: #getting-started-with-the-cex-device-plug-in}
+# Getting started with the CEX device plug-in
 
-## Creating and establishing a CEX resource configuration map {: #creating-and-establishing-a-cex-resource-configuration-map}
+## Creating and establishing a CEX resource configuration map
 
-The CEX device plug-in needs to know a valid CEX configuration to start up properly. This section deals with creating a CEX resource configuration.
+The CEX device plug-in needs to know a valid CEX configuration to start up
+properly. This section deals with creating a CEX resource configuration.
 
-In the CEX resource configuration, equivalent APQNs are grouped into equivalence sets, called *crypto config sets*. A *crypto config set* has a unique name and comprises of one or more equivalent APQNs. A pod with a crypto application requests a CEX resource by requesting the allocation of one arbitrary APQN from the *crypto config set* by the name of the *crypto config set*.
+In the CEX resource configuration, equivalent APQNs are grouped into equivalence
+sets, called *crypto config sets*. A *crypto config set* has a unique name and
+comprises of one or more equivalent APQNs. A pod with a crypto application
+requests a CEX resource by requesting the allocation of one arbitrary APQN from
+the *crypto config set* by the name of the *crypto config set*.
 <!-- ?? from/by ?? -->
 
-### Considerations for equally configured APQNs {: #considerations-for-equally-configured-apqns}
+### Considerations for equally configured APQNs
 
 Within each config set, all the APQNs must be set up consistently.
 For each CEX mode, consider:
@@ -16,13 +21,24 @@ For each CEX mode, consider:
 - For EP11 CEX resources, the EP11 wrapping key and control settings should be equal.
 - CEX accelerator resources are stateless and do not need any equal setup.
 
-A container requests exactly **one** *crypto config set* and obtains **one** CEX crypto resource from the CEX device plug-in if an APQN is available, healthy, and not already allocated. The APQN is randomly chosen and is assigned to the life time of the container.
+A container requests exactly **one** *crypto config set* and obtains **one** CEX
+crypto resource from the CEX device plug-in if an APQN is available, healthy,
+and not already allocated. The APQN is randomly chosen and is assigned to the
+container.
 
-The cluster-wide configuration of the CEX crypto resources is kept in a Kubernetes `ConfigMap` within the `kube-system` namespace. The `ConfigMap` must be named `cex-resources-config`. The content of the `ConfigMap` is a configuration file section in JSON format.
+The cluster-wide configuration of the CEX crypto resources is kept in a
+Kubernetes `ConfigMap` within the same namespace as the device plug-in.
+If the Kustomize base deployment provided in
+[git repository](https://github.com/ibm-s390-cloud/k8s-cex-dev-plugin) is used,
+the namespace is called `cex-device-plugin`. The name of the `ConfigMap` must be
+`cex-resources-config` and the content is a configuration file section in JSON
+format.
 
-A working sample is provided in the appendix [Sample CEX resource configuration map](appendix.md#sample-cex-resource-configuration-map).
+A working sample is provided in the appendix
+[Sample CEX resource configuration map](appendix.md#sample-cex-resource-configuration-map).
 
-The following example shows only the head and some possibly *crypto config set* definitions:
+The following example shows only the head and some possibly *crypto config set*
+definitions:
 
 ~~~json
 
@@ -30,7 +46,7 @@ The following example shows only the head and some possibly *crypto config set* 
     kind: ConfigMap
     metadata:
       name: cex-resources-config
-      namespace: kube-system
+      namespace: cex-device-plugin
     data:
       cex_resources.json: |
         {
@@ -64,7 +80,7 @@ The following example shows only the head and some possibly *crypto config set* 
 The `ConfigMap` defines a list of configuration sets. Each configuration
 set comprises the following entries:
 
-### Basic parameters {: #basic-parameters}
+### Basic parameters
 
 - `setname`: required, can be any string value, must be unique within
   all the configuration sets. This is the identifier used by the
@@ -89,20 +105,28 @@ set comprises the following entries:
   log entry and discards the use of the APQN for the configuration set.
 - `overcommit`: optional, specifies the overcommit limit for resources in
   this ConfigSet. If the parameter is omitted, it defaults to the value
-  specified through the environment variable APQN_OVERCOMMIT_LIMIT. If the environment
-  variable is not specified, the default value for overcommit is 1 (no overcommit).
+  specified through the environment variable APQN_OVERCOMMIT_LIMIT. If the
+  environment variable is not specified, the default value for overcommit is 1
+  (no overcommit).
 
-### APQN parameters {: #apqn-parameters}
+### APQN parameters
 
-* `apqns`: A list of equivalent APQN entries. The exact meaning of *equivalent* depends on the crypto workload to be run with the *crypto config set*. However, it forms a set of APQNs where anyone is sufficient to fulfill the needs of the requesting crypto workload container. See
+* `apqns`: A list of equivalent APQN entries. The exact meaning of *equivalent*
+  depends on the crypto workload to be run with the *crypto config
+  set*. However, it forms a set of APQNs where anyone is sufficient to fulfill
+  the needs of the requesting crypto workload container. See
   [Considerations for equally configured APQNs](#considerations-for-equally-configured-apqns).
 
-  For example, a CCA application that uses a given AES secure key always relies on APQNs with a master key that wraps this secure key,
-  regardless on which container it runs. In other words the master key setup of the APQNs within a ConfigSet should be the same.
+  For example, a CCA application that uses a given AES secure key always relies
+  on APQNs with a master key that wraps this secure key, regardless on which
+  container it runs. In other words the master key setup of the APQNs within a
+  ConfigSet should be the same.
 
   <!-- RB: to be discussed delete first sentence An APQN ... config set. -->
-  An APQN must not be member of more than one *crypto config set*. It is valid to provide an empty list.
-  It is also valid to provide APQNs, which might currently not exist but might come into existence sometime in future when new crypto cards are plugged.
+  An APQN must not be member of more than one *crypto config set*. It is valid
+  to provide an empty list. It is also valid to provide APQNs, which might
+  currently not exist but might come into existence sometime in future when new
+  crypto cards are plugged.
 
   The most simple APQN entry comprises these two fields:
   - `adapter`: required, the CEX card number. Can be in the range of 0-255.
@@ -126,7 +150,9 @@ set comprises the following entries:
 
     For example, a valid value for `machineid` is `IBM-3906-00000000000829E7`.
 
-    The tuple (a,d) gets extended with the machine id, which is unique per hardware instance and the triple (a,d,maschineid) identifies an APQN again uniquely within the hardware instances.
+    The tuple (a,d) gets extended with the machine id, which is unique per
+    hardware instance and the triple (a,d,maschineid) identifies an APQN again
+    uniquely within the hardware instances.
 
 <!-- BEGIN - Commented out. This is stuff for future development
   Instead of the `adapter` field a `serialnr` field can be specified:
@@ -138,7 +164,7 @@ set comprises the following entries:
     xxx an explanation of how to obtain the serial number for a card should
     be here also - TKE ? sysfs  -->
 
-<!--### Alternative options to identify APQNs {: #alternative-options-to-identify-apqns}
+<!--### Alternative options to identify APQNs
 Alternatively APQNs can be identified based on the CEX mode. You can use them
 instead of specifying `apqn`.
 - `ccaaesmkvp`: specifies the CCA AES master key verification pattern against
@@ -165,10 +191,21 @@ including APQN identifier (1,1) has a different cexmode).
 Note, version 1 will enforce that no APQN identifier is a memeber of more than one crypto config set.
 -->
 
-### Establishing the CEX resource configuration map {: #establishing-the-cex-resource-configuration-map}
+### Establishing the CEX resource configuration map
 
-The CEX resource configuration map is a Kubernetes `ConfigMap` named `cex-resources-config` in the Kubernetes namespace `kube-system`. To deploy the clusterwide CEX `ConfigMap` using a yaml enter:
+The CEX resource configuration map is a Kubernetes `ConfigMap` named
+`cex-resources-config` in the same Kubernetes namespace as the CEX device
+plug-in.
 
-    kubectl create -f <my_cex_resources.yaml>
+The [CEX plug-in git repository](https://github.com/ibm-s390-cloud/k8s-cex-dev-plugin)
+contains a Kustomize base deployment that generates a configuration
+map from a given `cex_resources.json` file.
 
-Updates and maintenance steps are described in [CEX configuration ConfigMap updates](technical_concepts_limitations.md#cex-configuration-configmap-updates).
+1. Download the repository and go to the `deployments/configmap` folder.
+2. Edit the `cex_resources.json` JSON file in the `deployments/configmap` folder
+   with your favorite editor.
+3. To verify via pretty-print that you made valid JSON entries without errors,
+   run the following command: <br>`jq -r . cex_resources.json`<br>
+   If you see error messages, you need to fix them before continuing to the next step.
+4. To create the configurtion map, run the following command: <br>`oc create -k .`<br>
+   To update an already existing config map, run the following command: <br>`oc apply -k .`<br>

@@ -1,4 +1,4 @@
-# Additional resources {: #additional-resources}
+# Additional resources
 
 * IBM z15 Configuration Setup
 

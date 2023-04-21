@@ -1,4 +1,4 @@
-# Allocation of CEX resources by containers {: #allocation-of-cex-resources-by-containers}
+# Allocation of CEX resources by containers
 
 A container deployment can request one CEX resource from a CEX config set by
 specifying a resource statement as part of the container specification.
@@ -28,14 +28,19 @@ needs the following container specification:
             cex.s390.ibm.com/CCA_for_customer_1: 1
         ...
 
-[Sample CEX crypto load container](appendix.md#sample-cex-crypto-load-container) in the appendix
-is a simple but complete sample yaml file for a customer load with CEX resource
-allocation.
+[Sample CEX crypto load container](appendix.md#sample-cex-crypto-load-container)
+in the appendix is a simple but complete sample yaml file for a customer load
+with CEX resource allocation.
 
-When the Kubernetes system tries to run an instance of this container it recognizes the resource limitation. The CEX device plug-in instances should have registered plug-in-devices for each of the config sets, among them plug-in-devices for the `CCA_for_customer_1`. The Kubernetes system does the
-bookkeeping for all these devices and therefore knows, which devices are free and which devices were announced by the CEX
-device plug-in instances. The Kubernetes system chooses one compute node where a CEX device plug-in runs that had announced one
-of the free plug-in devices and forwards an allocation request to this plug-in.
+When the Kubernetes system tries to run an instance of this container it
+recognizes the resource limitation. The CEX device plug-in instances should have
+registered plug-in-devices for each of the config sets, among them
+plug-in-devices for the `CCA_for_customer_1`. The Kubernetes system does the
+bookkeeping for all these devices and therefore knows, which devices are free
+and which devices were announced by the CEX device plug-in instances. The
+Kubernetes system chooses one compute node where a CEX device plug-in runs that
+had announced one of the free plug-in devices and forwards an allocation request
+to this plug-in.
 
 The plug-in instance running on the compute node where the container gets
 applied, prepares the CEX resource and the sysfs shadow directories for the
@@ -45,9 +50,9 @@ have access to the allocated APQN and a customized `/sys/devices/ap` and
 `/sys/bus/ap` providing a limited view of the AP/zcrypt world.
 
 When the container finally finishes, the CEX device plug-in on the compute node spots
-this, cleans up the allocated resources, and the Kubernetes system marks the plug-in-device as unused.
-The allocated resources which are cleaned up are the customized additional zcrypt
-device node and the sysfs shadow dirs.
+this, cleans up the allocated resources, and the Kubernetes system marks the
+plug-in-device as unused. The allocated resources which are cleaned up are the
+customized additional zcrypt device node and the sysfs shadow dirs.
 
 ## Frequently asked questions
 

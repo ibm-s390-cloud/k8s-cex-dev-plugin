@@ -1,4 +1,4 @@
-# Troubleshooting {: #troubleshooting}
+# Troubleshooting
 
 This section provides information on diagnostics and troubleshooting.
 
@@ -7,26 +7,28 @@ the pod status, gather pod diagnostics, and collect debugging data.
 
 ## Prerequisites
 
-You must log in as a user that belongs to a role with administrative privileges for the cluster.
+You must log in as a user that belongs to a role with administrative
+privileges for the cluster.
 For example, `system:admin` or `kube:admin`.
 
 ## Verification
 
 The CEX device plug-in runs as a daemonset in namespace
-`kube-system`. 
+`cex-device-plugin`.
 
 The following query should list the CEX device plug-in daemonset:
 
-    $ kubectl get daemonsets -n kube-system
+    $ kubectl get daemonsets -n cex-device-plugin
     NAME                   DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
     cex-plugin-daemonset   3         3         3       3            3           <none>          4d
 
 The daemonset is realized as a pod with one container per each compute
-node. 
+node.
 
-To review the status of pods running in the CEX device plug-in and the kube-system namespace, run the following command:
+To review the status of pods running in the CEX device plug-in and the
+kube-system namespace, run the following command:
 
-    $ kubectl get pods -n kube-system
+    $ kubectl get pods -n cex-device-plugin
     NAME                         READY   STATUS    RESTARTS   AGE
     cex-plugin-daemonset-bfxt2   1/1     Running   0          3d23h
     cex-plugin-daemonset-bhhj8   1/1     Running   0          3d23h
@@ -35,24 +37,25 @@ To review the status of pods running in the CEX device plug-in and the kube-syst
 Verify that the pods are running correctly. There should be one pod
 per each compute node in status `Running`. If one or more of the CEX
 device plug-in pods do not show up or are not showing a `Running`
-status, you can collect diagnostic information. 
+status, you can collect diagnostic information.
 
 To inspect the status of a pod in detail, use the `describe` subcommand, for example:
 
-    $ kubectl describe pod cex-plugin-daemonset-bfxt2 -n kube-system
+    $ kubectl describe pod cex-plugin-daemonset-bfxt2 -n cex-device-plugin
 
 When these requirements are fulfilled, ensure that you have a CEX
 resource configuration map, which defines the *CEX config sets*
-deployed in namespace `kube-system`:
+deployed in namespace `cex-device-plugin`:
 
-    $ kubectl get configmap -n kube-system
+    $ kubectl get configmap -n cex-device-plugin
     NAME                                 DATA   AGE
     ...                                  ...    ...
     cex-resources-config                 1      4d2h
     ...                                  ...    ...
 
-To verify if a configmap has been deployed, run kubectl describe on one of the
-plug-in pods. If no configmap is deployed the output will show a message that the volume mount failed, for example:
+To verify if a configmap has been deployed, run kubectl describe on
+one of the plug-in pods. If no configmap is deployed the output will
+show a message that the volume mount failed, for example:
 
     MountVolume.SetUp failed for volume "cex-resources-conf" : configmap "cex-resources-config" not found
 
@@ -85,18 +88,19 @@ compute node:
 
 Each CEX device plug-in pod provides log messages, which provide
 details that might explain a possible failure or misbehavior. The logs
-of each of the CEX device plug-in instances can be extracted with the following
-command sequence:
+of each of the CEX device plug-in instances can be extracted with the
+following command sequence:
 
-    $ kubectl get pods -n kube-system --no-headers | grep cex-plugin-daemonset
+    $ kubectl get pods -n cex-device-plugin --no-headers | grep cex-plugin-daemonset
     cex-plugin-daemonset-p5j8h   1/1   Running   0     32m
     cex-plugin-daemonset-qdz8r   1/1   Running   0     32m
     cex-plugin-daemonset-zxwts   1/1   Running   0     32m
-    $ kubectl logs -n kube-system cex-plugin-daemonset-p5j8h
-    $ kubectl logs -n kube-system cex-plugin-daemonset-qdz8r
-    $ kubectl logs -n kube-system cex-plugin-daemonset-zxwts
+    $ kubectl logs -n cex-device-plugin cex-plugin-daemonset-p5j8h
+    $ kubectl logs -n cex-device-plugin cex-plugin-daemonset-qdz8r
+    $ kubectl logs -n cex-device-plugin cex-plugin-daemonset-zxwts
 
-Here are some important parts of a sample CEX device plug-in log shown with some explanations:
+Here are some important parts of a sample CEX device plug-in log shown
+with some explanations:
 
      1: 2022/06/07 14:05:18 Main: S390 k8s z crypto resources plugin starting
      2: 2022/06/07 14:05:18 Plugin Version: v1.0.2
@@ -199,7 +203,7 @@ cleanup step, which is reported in the log as follows:
     ...
 
 
-## Capturing debug data for support {: capturing-debug-data-for-support}
+## Capturing debug data for support
 
 If you submit a support case, provide debugging data. Describe the
 failure and the expected behavior and collect the logs of **all** CEX
@@ -212,9 +216,9 @@ For example, run following commands to collect the required
 information:
 
     $ cd /tmp
-    $ for p in `kubectl get pods -n kube-system --no-headers | grep cex-plugin-daemonset | awk '{print $1}'`; do \
-	kubectl logs -n kube-system $p >$p.log; done
-    $ kubectl get configmap -n kube-system cex-resources-config -o yaml >cex-resources-config.yaml
+    $ for p in `kubectl get pods -n cex-device-plugin --no-headers | grep cex-plugin-daemonset | awk '{print $1}'`; do \
+	kubectl logs -n cex-device-plugin $p >$p.log; done
+    $ kubectl get configmap -n cex-device-plugin cex-resources-config -o yaml >cex-resources-config.yaml
     $ kubectl describe nodes >describe_nodes.log
     $ zip debugdata.zip cex-plugin-daemonset-*.log cex-resources-config.yaml describe_nodes.log
     $ rm cex-plugin-daemonset-*.log cex-resources-config.yaml describe_nodes.log

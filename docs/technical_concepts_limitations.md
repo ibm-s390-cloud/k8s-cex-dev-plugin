@@ -1,6 +1,6 @@
-# Technical Concepts and Limitations {: #technical_concepts_limitations}
+# Technical Concepts and Limitations
 
-## CEX configuration ConfigMap updates {: #cex-configuration-configmap-updates}
+## CEX configuration ConfigMap updates
 
 From a cluster administration point of view it is desirable to change the CEX
 configuration in the cluster-wide crypto ConfigMap. For example, to add or remove
@@ -12,23 +12,23 @@ This can be done during regular cluster uptime but with some carefulness. Every
 re-read by all the CEX device plug-in instances. The new ConfigMap is verified and if
 valid, activated as the new current ConfigMap. On successful ConfigMap
 re-read the plug-in logs a message:
-
+```
     CryptoConfig: updated configuration
-
+```
 If the verification of the new CEX ConfigMap fails, the CEX device plug-in logs an
 error message. One reason for the verification failure might be the failure to
 read or parse the ConfigMap resulting in error logs like:
-
+```
     CryptoConfig: Can't open config file ...
-
+```
 or
-
+```
     CryptoConfig: Error parsing config file ...
-
+```
 If the verification step fails, the following message is displayed:
-
+```
     Config Watcher: failed to verify new configuration!
-
+```
 These failures result in running the plug-in instances without any configuration map.
 
 The log messages appear periodically until yet another update of the ConfigMap
@@ -38,22 +38,25 @@ is finally accepted as valid.
 (typically up to 2 minutes) to propagate the changes to all nodes.
 Another, potentially faster, way to update the configuration map for the plug-in is to
 restart the rollout of the deployment via:
-
-    kubectl rollout restart daemonset <name-of-the-cex-plug-in-daemonset> -n kube-system
-
+```
+    kubectl rollout restart daemonset <name-of-the-cex-plug-in-daemonset> -n cex-device-plugin
+```
 This triggers a restart of each instance of the daemonset in a coordinated way
 by Kubernetes.
 
 
-## Overcommitment of CEX resources {: #overcommitment-of-cex-resources}
+## Overcommitment of CEX resources
 
-By default, a CEX resource (an APQN) maps to exactly one Kubernetes *plug-in-device*. This is the administration unit known by Kubernetes and in fact
-a container requests such a plug-in device.
+By default, a CEX resource (an APQN) maps to exactly one Kubernetes
+*plug-in-device*. This is the administration unit known by Kubernetes and in
+fact a container requests such a plug-in device.
 
-By default, the CEX device plug-in maps each available APQN to one plug-in device and as a result one APQN is assigned to a container requesting a CEX resource.
+By default, the CEX device plug-in maps each available APQN to one plug-in
+device and as a result one APQN is assigned to a container requesting a CEX
+resource.
 
-The CEX device plug-in can provide more than one plug-in-device per APQN, which allows
-some overcommitment of the available CEX resources.
+The CEX device plug-in can provide more than one plug-in-device per APQN, which
+allows some overcommitment of the available CEX resources.
 
 Setting the environment variable `APQN_OVERCOMMIT_LIMIT` to a value greater than
 1 (default is 1) allows to control how many plug-in devices are announced to the
@@ -79,7 +82,7 @@ already running containers continue to run, even if a used resource is no more
 available because of the decreased number of available resources. Due to lack
 of resources, those containers cannot be restarted.
 
-## The device node z90crypt {: #the-device-node-z90crypt}
+## The device node z90crypt
 
 On a compute node, the device node `/dev/z90crypt` offers access to all zcrypt
 devices known to the compute running as a KVM guest. The application of a
@@ -101,13 +104,15 @@ With version 1 of the CEX device plug-in, the constructed zcrypt device nodes li
 access to exact one APQN (adapter, usage domain, no control domain), allowing
 all ioctls.
 
-**Note:** These settings allow both usage and control actions, which are restricted to the underlying APQN with the `/dev/z90crypt`
-device that is visible inside the container, even with overcommited plug-in devices.
+**Note:** These settings allow both usage and control actions, which are
+restricted to the underlying APQN with the `/dev/z90crypt` device that is
+visible inside the container, even with overcommited plug-in devices.
 
 
-## The shadow sysfs {: #the-shadow-sysfs}
+## The shadow sysfs
 
-The CEX device plug-in manipulates the AP part of the sysfs that a container can explore. The sysfs tree within a container contains two directories related to
+The CEX device plug-in manipulates the AP part of the sysfs that a container can
+explore. The sysfs tree within a container contains two directories related to
 the AP/zcrypt functionality: `/sys/bus/ap` and `/sys/devices/ap`.
 
 Tools working with zcrypt devices, like `lszcrypt` or `ivp.e`, need to see the
@@ -122,15 +127,19 @@ directory on the compute node.
 
 These shadow directory trees are simple static files that are created from the original
 sysfs entries on the compute node. They loose their sysfs functionality and
-show a static view of a limited AP/zcrypt world. For example, `/sys/bus/ap/ap_adapter_mask` is a 256 bit field listing all available adapters
-(crypto cards). The manipulated file that appears inside the container only shows
-the adapter that belongs to the assigned APQN. All load and counter values in the
-corresponding sysfs attributes, for example `/sys/devices/ap/card<xx>/<xx>.<yyyy>/request_count`, show up as 0 and don't get updates when a crypto load is running.
+show a static view of a limited AP/zcrypt world. For example,
+`/sys/bus/ap/ap_adapter_mask` is a 256 bit field listing all available adapters
+(crypto cards). The manipulated file that appears inside the container only
+shows the adapter that belongs to the assigned APQN. All load and counter values
+in the corresponding sysfs attributes, for example
+`/sys/devices/ap/card<xx>/<xx>.<yyyy>/request_count`, show up as 0 and don't get
+updates when a crypto load is running.
 
 This restricted sysfs within a container should be sufficient to satisfy the
 discovery tasks of most applications (`lszcrypt`, `ivp.e`, opencryptoki with CCA
-or EP11 token) but has limits. For example, `chzcrypt` will fail to change sysfs attributes,
-offline switch of a queue will not work, and applications inspecting counter values might get confused.
+or EP11 token) but has limits. For example, `chzcrypt` will fail to change sysfs
+attributes, offline switch of a queue will not work, and applications inspecting
+counter values might get confused.
 
 An administrator logged into a Kubernetes compute node could figure out the
 assignment of a CEX resource and a requesting container. For example, by reading
@@ -139,32 +148,33 @@ APQN on the compute node reflect the crypto load of the associated container and
 `lszcrypt` can be used.
 
 
-## Hot plug and hot unplug of APQNs {: #hot-plug-and-hot-unplug-of-apqns}
+## Hot plug and hot unplug of APQNs
 
-The CEX device plug-in monitors the APQNs available on the compute node by default every
-30 seconds. This comprises the existence of APQNs and their *online* state. When
-the compute node runs as a KVM guest it is possible to *live* modify the devices
-section of the guest's xml definition at the KVM host, which results in APQNs
-appearing or disappearing. The AP bus and zcrypt device driver inside the Linux
-system recognizes this as hot plug or unplug of crypto cards and/or domains.
+The CEX device plug-in monitors the APQNs available on the compute node by
+default every 30 seconds. This comprises the existence of APQNs and their
+*online* state. When the compute node runs as a KVM guest it is possible to
+*live* modify the devices section of the guest's xml definition at the KVM host,
+which results in APQNs appearing or disappearing. The AP bus and zcrypt device
+driver inside the Linux system recognizes this as hot plug or unplug of crypto
+cards and/or domains.
 
 It is also possible to directly change the *online* state of a card or APQN
-within a compute node. For example, an APQN might be available but switched to *offline*
-by intention by an system administrator.
+within a compute node. For example, an APQN might be available but switched to
+*offline* by intention by an system administrator.
 
-A dialog on the HMC offers the possibility to *configure off* and
-*configure on* CEX cards assigned to an LPAR. A CEX card in *config off* state is
-still visible in the LPAR and thus in the compute node but similar to the
-*offline* state no longer usable.
+A dialog on the HMC offers the possibility to *configure off* and *configure on*
+CEX cards assigned to an LPAR. A CEX card in *config off* state is still visible
+in the LPAR and thus in the compute node but similar to the *offline* state no
+longer usable.
 
 All this might cause the CEX device plug-in to deal with varying CEX
 resources. The plug-in code is capable of handling hot plug, hot unplug, the
-*online* state changes of CEX resources, and reports changes in the config set to
-the Kubernetes system. Because of this handling, APQNs can be included
-into the CEX config sets, which might not exist at the time of first deployment of
-the CEX configuration map. At a later time the card is hot plugged and assigned to the
-running LPAR. The cluster will spot this and make the appearing APQNs, which
-are already a member in a config set, available for allocation requests.
+*online* state changes of CEX resources, and reports changes in the config set
+to the Kubernetes system. Because of this handling, APQNs can be included into
+the CEX config sets, which might not exist at the time of first deployment of
+the CEX configuration map. At a later time the card is hot plugged and assigned
+to the running LPAR. The cluster will spot this and make the appearing APQNs,
+which are already a member in a config set, available for allocation requests.
 
 The handling of the *online* state is done by reporting the relevant plug-in
 devices as *healthy* (online) or *unhealthy* (offline). An *unhealthy*
@@ -181,7 +191,7 @@ bad return code causing Kubernetes to re-establish a new container, which will
 claim a CEX resource and the situation recovers automatically.
 
 
-## SELinux and the Init Container {: #selinux-and-the-init-container}
+## SELinux and the Init Container
 
 The CEX device plug-in prepares various files and directories that become mounted
 to the pod at an allocation request. Among those mounts are the directories
@@ -198,24 +208,27 @@ for such mechanisms.  Instead, in the SELinux case, an Init Container
 can be used to set the correct label on the shadow sysfs root folder
 `/var/tmp/shadowsysfs` that contains all the sub-folders that are
 mapped into pods.  See [Sample CEX device plug-in daemonset
-yaml](appendix.md#sample-cex-device-plug-in-daemonset-yaml) for an example of a daemonset
-deployment of the CEX device plug-in that contains an init container to
-set up `/var/tmp/shadowsysfs` for use in a SELinux-enabled environment.
+yaml](appendix.md#sample-cex-device-plug-in-daemonset-yaml) for an example of a
+daemonset deployment of the CEX device plug-in that contains an init container
+to set up `/var/tmp/shadowsysfs` for use in a SELinux-enabled environment.
 
-## Limitations {: #limitations}
+## Limitations
 
-### Namespaces and the project field {: #namespaces-and-the-project-field}
+### Namespaces and the project field
 
 The `project` field of a CEX config set should match the namespace of the
-container requesting a member of this set. This results in only *blue* applications
-being able to allocate *blue* APQNs from the *blue* config set.
+container requesting a member of this set. This results in only *blue*
+applications being able to allocate *blue* APQNs from the *blue* config set.
 
-Unfortunately, the allocation request forwarded from the Kubernetes system to the
-CEX device plug-in does not provide any namespace information. Therefore, the plug-in is not able to check the namespace affiliation.
+Unfortunately, the allocation request forwarded from the Kubernetes system to
+the CEX device plug-in does not provide any namespace information. Therefore,
+the plug-in is not able to check the namespace affiliation.
 
-When the container runs, the surveillance loop of the CEX device plug-in detects this mismatch and displays a log entry:
-
-`PodLister: Container <aaa> in namespace <bbb> uses a CEX resource <ccc> marked for project <ddd>!`.
+When the container runs, the surveillance loop of the CEX device plug-in detects
+this mismatch and displays a log entry:
+```
+PodLister: Container <aaa> in namespace <bbb> uses a CEX resource <ccc> marked for project <ddd>!.
+```
 
 This behavior can be a security risk as this opens the possibility to use the
 HSM of another group of applications. However, to really exploit this, more is
@@ -224,7 +237,7 @@ insert a self made secure key into the target application.
 
 As a workaround, you can set quotas for all namespaces except for the one
 that is allowed to use the resource. See the following example:
-
+```
     apiVersion: v1
     kind: ResourceQuota
     metadata:
@@ -234,8 +247,13 @@ that is allowed to use the resource. See the following example:
       hard:
         requests.cex.s390.ibm.com/red: 0
         limits.cex.s390.ibm.com/red: 0
-
+```
 This yaml snippet restricts the namespace *blue* to allocate zero CEX resources
-from the crypto config set *cex.s390.ibm.com/red*. The result is that all containers, which belong to the *blue* namespace, are not able to allocate *red* CEX resources any more.
+from the crypto config set *cex.s390.ibm.com/red*. The result is that all
+containers, which belong to the *blue* namespace, are not able to allocate *red*
+CEX resources any more.
 
-[Sample CEX quota restriction script](appendix.md#sample-cex-quota-restriction-script) in the appendix shows a bash script that produces a yaml file, which establishes these quota restrictions.
+[Sample CEX quota restriction
+script](appendix.md#sample-cex-quota-restriction-script) in the appendix shows a
+bash script that produces a yaml file, which establishes these quota
+restrictions.

@@ -40,6 +40,7 @@
 <topicref href="installing_and_configuring_the_cex_device_plug_in.md" format="markdown"/>
 <topicref href="allocation_of_cex_resources_by_containers.md" format="markdown"/>
 <topicref href="technical_concepts_limitations.md" format="markdown"/>
+<topicref href="prometheus_support.md" format="markdown"/>
 <topicref href="troubleshooting.md" format="markdown"/> 
 </chapter>
 <ibmbackmatter>
