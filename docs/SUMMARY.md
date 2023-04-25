@@ -46,6 +46,7 @@ Crypto Express (CEX) cards available for IBM Z and LinuxONE (s390x).
     * [Environment variables](appendix.md#environment-variables)
       * [Environment variable recognized by the cex-plug-in application](appendix.md#environment-variable-recognized-by-the-cex-plug-in-application)
       * [Environment variable recognized by the cex-prometheus-exporter application](appendix.md#environment-variable-recognized-by-the-cex-prometheus-exporter-application)
+    * [Migrating from kube-system to cex-device-plugin Namespace](migration.md)
   * [Additional resources](additional_resources.md)
   * [Notices](notices.md)
     * [Trademarks](notices.md#trademarks)

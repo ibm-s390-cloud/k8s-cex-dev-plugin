@@ -5,7 +5,7 @@
 <ibmbook xml:lang="en-us">
 <ibmbooktitle>
 <ibmbooklibrary><titleline>Kubernetes device plug-in for IBM Crypto Express (CEX) cards
-</titleline><titleline>Version 1.0.2</titleline></ibmbooklibrary>
+</titleline><titleline>Version 1.1.0</titleline></ibmbooklibrary>
 <ibmmainbooktitle><titleline>Installation and User Guide</titleline></ibmmainbooktitle>
 </ibmbooktitle>
 <bookmeta>

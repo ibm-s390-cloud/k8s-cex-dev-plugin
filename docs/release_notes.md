@@ -25,7 +25,8 @@ cards contains one new feature and one bug fix.
 
 This update includes one new feature:
 
-* The OVERCOMMIT limit can be specified per configset with an `overcommit:` field.
+* The OVERCOMMIT limit can be specified per configset with an `overcommit:`
+  field.
 
 ### Resolved issues
 
@@ -33,6 +34,32 @@ This update includes one new feature:
   the protobuf package:
    * [https://nvd.nist.gov/vuln/detail/CVE-2021-3121](https://nvd.nist.gov/vuln/detail/CVE-2021-3121)
    * [http://github.com/gogo/protobuf](http://github.com/gogo/protobuf).
+
+## Version 1.1.0
+
+The new version 1.1.0 of the Kubernetes device plug-in for IBM Crypto Express
+(CEX) cards includes the exploration of Prometheus metrics around the crypto
+resources managed by the plug-in. It also comes with support for *OCP 4.12* with
+enforced *Security Context Constrains (SCC)*. By default the CEX device plugin
+now installes into it's own namespace *cex-device-plugin* and all the
+deployments have been rearranged for *Kustomize* support to make it easier to
+create and update the CEX device plugin entities.
+
+### Features
+
+- Prometheus metrics support
+- New namespace 'cex-device-plugin' (See
+  [Migrating from kube-system to cex-device-plugin Namespace](migration.md))
+- Enabled for OCP 4.12 with enforced SCC support
+- Kustimize support
+
+### Resolved issues
+
+The code has been rebuild with updated libraries because of CVE findings in
+libraries the CEX device plug-in depends on:
+- CVE-2022-3172 (Medium) in k8s.io/apiMachinery-v0.20.4
+- CVE-2022-21698 (High) in github.com/prometheus/client_goLang-v1.11.0
+- CVE-2022-32149 (High) in golang.org/x/text-v0.3.4
 
 ## Known issues
 
