@@ -6,7 +6,9 @@ IBM CryptoExpress (CEX) cards on IBM Z and LinuxONE (s390x).
 
 ## Documentation
 
-You can get the documentation [here](https://www.ibm.com/support/pages/node/6520698).
+Documentation for the community version is available [here](docs/SUMMARY.md).
+
+IBM provides a pdf documentation which can be found via this [link](https://www.ibm.com/support/pages/node/6520698).
 
 
 ## How to obtain the image
@@ -21,7 +23,7 @@ RedHat OpenShift Container Platform, available [here](https://catalog.redhat.com
 ## Contributing
 
 Contributions have to be submitted under the Apache License, Version 2.0.
-See also the [LICENSE](LICENSE) file.
+See also the [LICENSE](LICENSE.md) file.
 
 ### Developer's Certificate of Origin
 
@@ -39,7 +41,7 @@ You can use GitHub Issues to report problems.
 ## License
 
 The Kubernetes device plug-in for IBM CryptoExpress (CEX) cards is
-licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE)
+licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE.md)
 for the full license text.
 
 ## Authors
