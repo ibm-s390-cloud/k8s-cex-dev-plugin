@@ -62,6 +62,8 @@ func getenvint(envvar string, defaultval, minval, maxval int) int {
 	return defaultval
 }
 
+func Int(v int) *int { return &v }
+
 func TestCryptoConfigVerification(t *testing.T) {
 	var tests = []struct {
 		config CryptoConfig
@@ -180,6 +182,48 @@ func TestCryptoConfigVerification(t *testing.T) {
 				},
 			},
 			name: "negative adapter",
+			want: false,
+		},
+		// livesysfs value 1 given
+		{
+			config: CryptoConfig{
+				CryptoConfigSets: []*CryptoConfigSet{
+					&CryptoConfigSet{
+						SetName:   "set",
+						Project:   "test",
+						Livesysfs: Int(1),
+					},
+				},
+			},
+			name: "valid livesysfs 1 value",
+			want: true,
+		},
+		// livesysfs value 0 given
+		{
+			config: CryptoConfig{
+				CryptoConfigSets: []*CryptoConfigSet{
+					&CryptoConfigSet{
+						SetName:   "set",
+						Project:   "test",
+						Livesysfs: Int(0),
+					},
+				},
+			},
+			name: "valid livesysfs 0 value",
+			want: true,
+		},
+		// invalid livesysfs value -1 given
+		{
+			config: CryptoConfig{
+				CryptoConfigSets: []*CryptoConfigSet{
+					&CryptoConfigSet{
+						SetName:   "set",
+						Project:   "test",
+						Livesysfs: Int(-1),
+					},
+				},
+			},
+			name: "invalid livesysfs -1 value",
 			want: false,
 		},
 		{

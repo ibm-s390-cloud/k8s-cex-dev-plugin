@@ -38,6 +38,7 @@ const (
 )
 
 var (
+	apqnLiveSysfs       = getenvint("APQN_LIVE_SYSFS", 1, 0, 1)                        // live sysfs is by default enabled
 	apqnOverCommitLimit = getenvint("APQN_OVERCOMMIT_LIMIT", 1, 1, 100)                // overcommit limit: 1 is no overcommit
 	apqnsCheckInterval  = time.Duration(getenvint("APQN_CHECK_INTERVAL", 30, 10, 120)) // device health check interval in seconds
 )
@@ -155,6 +156,12 @@ func (p *ZCryptoResPlugin) makePluginDevsFromAPQNs() []*kdp.Device {
 
 	var devices []*kdp.Device
 
+	if p.ccset.Livesysfs == nil {
+		p.ccset.Livesysfs = &apqnLiveSysfs
+		log.Printf("Plugin['%s']: Livesysfs not specified in ConfigSet, using '%d'\n",
+			p.resource, apqnLiveSysfs)
+	}
+
 	if p.ccset.Overcommit <= 0 {
 		p.ccset.Overcommit = apqnOverCommitLimit
 		log.Printf("Plugin['%s']: Overcommit not specified in ConfigSet, fallback to %d \n",
@@ -198,9 +205,16 @@ func (p *ZCryptoResPlugin) checkChanged() bool {
 		apqnsChanged = true
 	}
 
-	// check for change in ConfigSet (currently only overcommit limit)
+	// check for overcommit change in ConfigSet
 	if ccset != nil && ccset.Overcommit != p.ccset.Overcommit {
 		log.Printf("Plugin['%s']: Rescan found changes in ConfigSet: overcommit limit has changed\n",
+			p.resource)
+		configChanged = true
+	}
+
+	// check for livesysfs change in ConfigSet
+	if ccset != nil && *ccset.Livesysfs != *p.ccset.Livesysfs {
+		log.Printf("Plugin['%s']: Rescan found changes in ConfigSet: livesysfs parameter has changed\n",
 			p.resource)
 		configChanged = true
 	}
@@ -348,7 +362,7 @@ func (p *ZCryptoResPlugin) Allocate(ctx context.Context, req *kdp.AllocateReques
 			dev.Permissions = "rw"
 			carsp.Devices = append(carsp.Devices, dev)
 			// create AP bus and devices shadow sysfs for this container and mount them into the container
-			apbusdir, apdevsdir, err := makeShadowApSysfs(id, card, queue)
+			apbusdir, apdevsdir, err := makeShadowApSysfs(id, *p.ccset.Livesysfs, card, queue)
 			if err != nil {
 				log.Printf("Plugin['%s']: Error creating shadow sysfs for device '%s': %s\n", p.resource, id, err)
 				defer zcryptDestroyNode(znode)
@@ -362,6 +376,14 @@ func (p *ZCryptoResPlugin) Allocate(ctx context.Context, req *kdp.AllocateReques
 				ContainerPath: "/sys/devices/ap",
 				HostPath:      apdevsdir,
 				ReadOnly:      true})
+			if *p.ccset.Livesysfs > 0 {
+				err = addLiveMounts(id, &carsp, card, queue)
+				if err != nil {
+					log.Printf("Plugin['%s']: Error adding live mounts for device '%s': %s\n", p.resource, id, err)
+					defer zcryptDestroyNode(znode)
+					return nil, fmt.Errorf("Error adding live mounts for device '%s'", id)
+				}
+			}
 			p.tellMetricsCollAboutAlloc(id)
 			// only one device per container supported
 			break

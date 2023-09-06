@@ -63,6 +63,7 @@ type CryptoConfigSet struct {
 	CexMode    string    `json:"cexmode"`
 	MinCexGen  string    `json:"mincexgen"`
 	Overcommit int       `json:"overcommit"`
+	Livesysfs  *int      `json:"livesysfs,omitempty"`
 	APQNDefs   []APQNDef `json:"apqns"`
 }
 
@@ -168,6 +169,16 @@ func (cc CryptoConfig) Verify() bool {
 			log.Printf("%s Optional overcommit limit %d specified in config set\n",
 				prestr, s.Overcommit)
 		}
+		// check optional livesysfs parameter
+		if s.Livesysfs != nil {
+			// accect values >= 0, meaning 0: livesysfs disabled, > 0 livesysfs enabled
+			if *s.Livesysfs < 0 {
+				log.Printf("%s Unknown/unsupported livesysfs value '%d'\n", prestr, *s.Livesysfs)
+				return false
+			}
+			log.Printf("%s Optional 'livesysfs = %d' parameter specified in config set\n",
+				prestr, *s.Livesysfs)
+		}
 		// check APQNDefs
 		for k, a := range s.APQNDefs {
 			// check APQN adapter value
@@ -225,6 +236,9 @@ func (cc CryptoConfig) PrettyLog() {
 		}
 		if e.Overcommit > 0 {
 			log.Printf("    overcommit: %d\n", e.Overcommit)
+		}
+		if e.Livesysfs != nil {
+			log.Printf("    livesysfs: %d\n", e.Livesysfs)
 		}
 		n = len(e.APQNDefs)
 		if n > 0 {
@@ -288,8 +302,8 @@ func (cc *CryptoConfig) GetCryptoConfigSetForThisAPQN(ap, dom int, machineid str
 }
 
 func (s CryptoConfigSet) String() string {
-	return fmt.Sprintf("Set(setname=%s,project=%s,cexmode=%s,mincexgen=%s,overcommit=%d,apqndefs=%s)",
-		s.SetName, s.Project, s.CexMode, s.MinCexGen, s.Overcommit, s.APQNDefs)
+	return fmt.Sprintf("Set(setname=%s,project=%s,cexmode=%s,mincexgen=%s,overcommit=%d,livesysfs=%d,apqndefs=%s)",
+		s.SetName, s.Project, s.CexMode, s.MinCexGen, s.Overcommit, s.Livesysfs, s.APQNDefs)
 }
 
 func (s CryptoConfigSet) equal(o *CryptoConfigSet) bool {
@@ -299,6 +313,7 @@ func (s CryptoConfigSet) equal(o *CryptoConfigSet) bool {
 		s.CexMode != o.CexMode ||
 		s.MinCexGen != o.MinCexGen ||
 		s.Overcommit != o.Overcommit ||
+		s.Livesysfs != o.Livesysfs ||
 		len(s.APQNDefs) != len(o.APQNDefs) {
 		return false
 	}

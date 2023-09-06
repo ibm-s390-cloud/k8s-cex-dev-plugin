@@ -29,6 +29,8 @@ import (
 	"regexp"
 	"strings"
 	"syscall"
+
+	kdp "k8s.io/kubelet/pkg/apis/deviceplugin/v1beta1"
 )
 
 const (
@@ -89,6 +91,15 @@ var sys_devices_ap_card_fileswithvalue = []struct{ name, value string }{
 	{"request_count", "0\n"},
 	{"requestq_count", "0\n"},
 }
+var sys_devices_ap_card_fileswithvalue_live = []struct{ name, value string }{
+	{"load", "0\n"},
+}
+var sys_devices_ap_card_links_to_queuedir = []struct{ name, value string }{
+	{"online", "1\n"},
+	{"pendingq_count", "0\n"},
+	{"request_count", "0\n"},
+	{"requestq_count", "0\n"},
+}
 
 // sys/devices/ap/card<xx>/<xx>.<yyyy>/
 var sys_devices_ap_queue_copyfiles = []string{
@@ -107,7 +118,7 @@ var sys_devices_ap_queue_fileswithvalue = []struct{ name, value string }{
 	{"requestq_count", "0\n"},
 }
 
-func makeShadowApSysfs(id string, adapter, domain int) (string, string, error) {
+func makeShadowApSysfs(id string, livesysfs, adapter, domain int) (string, string, error) {
 
 	exists := func(name string) bool {
 		_, err := os.Stat(name)
@@ -283,9 +294,26 @@ func makeShadowApSysfs(id string, adapter, domain int) (string, string, error) {
 		if err != nil {
 			break
 		}
-		for _, e := range sys_devices_ap_card_fileswithvalue {
-			if err = makefile(shadowcarddir+"/"+e.name, e.value); err != nil {
-				break
+		if livesysfs > 0 {
+			log.Printf("Shadowsysfs: creating live sysfs\n")
+			for _, e := range sys_devices_ap_card_fileswithvalue_live {
+				if err = makefile(shadowcarddir+"/"+e.name, e.value); err != nil {
+					break
+				}
+			}
+			for _, e := range sys_devices_ap_card_links_to_queuedir {
+				linksrc := fmt.Sprintf("%s/%s", shadowcarddir, e.name)
+				linkdst := fmt.Sprintf("%02x.%04x/%s", adapter, domain, e.name)
+				if err = makelink(linksrc, linkdst); err != nil {
+					break
+				}
+			}
+		} else {
+			log.Printf("Shadowsysfs: creating static sysfs\n")
+			for _, e := range sys_devices_ap_card_fileswithvalue {
+				if err = makefile(shadowcarddir+"/"+e.name, e.value); err != nil {
+					break
+				}
 			}
 		}
 		if err != nil {
@@ -404,4 +432,42 @@ func delShadowSysfs(shadowdir string) {
 
 	dir := fmt.Sprintf("%s/%s", shadowbasedir, shadowdir)
 	os.RemoveAll(dir)
+}
+
+func addLiveMounts(id string, carsp *kdp.ContainerAllocateResponse, card, queue int) error {
+
+	makelink := func(src, dst string) error {
+		//fmt.Printf("debug: makelink(%s,%s)\n", src, dst)
+		err := os.Symlink(dst, src)
+		if err != nil {
+			log.Printf("Shadowsysfs: Failed to create symlink %s -> %s: %s\n", src, dst, err)
+			return fmt.Errorf("Shadowsysfs: Failed to create symlink %s -> %s: %s", src, dst, err)
+		}
+		return nil
+	}
+
+	shadowdir := fmt.Sprintf("%s/sysfs-%s", shadowbasedir, id)
+	apcarddir := fmt.Sprintf("%s/card%02x", apdevsdir, card)
+	apqueuedir := fmt.Sprintf("%s/%02x.%04x", apcarddir, card, queue)
+
+	// Create symlink from original ap queue dir to tmp_bus dir in shadowsysfs
+	linkdst := fmt.Sprintf("%s", apqueuedir)
+	linksrc := fmt.Sprintf("%s/tmp_bus", shadowdir)
+	if err := makelink(linksrc, linkdst); err != nil {
+		log.Printf("Shadowsysfs: Error makelink: %s --> %s\n", linkdst, linksrc)
+		return fmt.Errorf("Shadowsysfs: Failed to create directory symlink from %s to %s/tmp_bus", apqueuedir, shadowdir)
+	}
+
+	// Over-mount container dir with tmp_bus dir in shadowsysfs
+	container_path := fmt.Sprintf("%s/devices/%02x.%04x", apbusdir, card, queue)
+	host_path := fmt.Sprintf("%s/tmp_bus", shadowdir)
+	carsp.Mounts = append(carsp.Mounts, &kdp.Mount{
+		ContainerPath: container_path,
+		HostPath:      host_path,
+		ReadOnly:      true})
+
+	log.Printf("Shadowsysfs: Container has now live access to host's %s.\n", apqueuedir)
+	log.Printf("Shadowsysfs: Files in %s are symlinked to %s.\n", apcarddir, apqueuedir)
+
+	return nil
 }
