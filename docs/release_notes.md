@@ -61,6 +61,12 @@ libraries the CEX device plug-in depends on:
 - CVE-2022-21698 (High) in github.com/prometheus/client_goLang-v1.11.0
 - CVE-2022-32149 (High) in golang.org/x/text-v0.3.4
 
+## Version 1.1.1
+
+The code has been rebuilt with updated libraries because of a CVE finding
+in a dependent library:
+- CVE-2023-39325 (High) in golang.org/x/net-v0.9.0 (see [https://nvd.nist.gov/vuln/detail/CVE-2023-39325](https://nvd.nist.gov/vuln/detail/CVE-2023-39325))
+
 ## Known issues
 
 There are no known issues. See
