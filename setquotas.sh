@@ -43,7 +43,7 @@ while ! test -z "$1"; do
     c=0
     echo "apiVersion: v1" > quota-$n.yaml
     echo "items:" >> quota-$n.yaml
-    for s in `oc get cm cex-resources-config -n kube-system -o jsonpath='{.data.cex_resources\.json}' | jq -r ".cryptoconfigsets | .[] | select(.project != \"$n\") | .setname"`; do
+    for s in `oc get cm cex-resources-config -n cex-device-plugin -o jsonpath='{.data.cex_resources\.json}' | jq -r ".cryptoconfigsets | .[] | select(.project != \"$n\") | .setname"`; do
 	c=$(( c + 1 ))
 	createquota $n $s $c
     done
