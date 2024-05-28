@@ -67,6 +67,11 @@ The code has been rebuilt with updated libraries because of a CVE finding
 in a dependent library:
 - CVE-2023-39325 (High) in golang.org/x/net-v0.9.0 (see [https://nvd.nist.gov/vuln/detail/CVE-2023-39325](https://nvd.nist.gov/vuln/detail/CVE-2023-39325))
 
+## Version 1.1.2
+
+The code has been rebuilt with upgrade of the go language to 1.21 and updated
+libraries because of minor complains by quay.io and github at dependent libraries.
+
 ## Known issues
 
 There are no known issues. See
