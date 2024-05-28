@@ -19,7 +19,7 @@
 
 # cex-device-plugin build to build1
 
-FROM golang:1.18 as build1
+FROM golang:1.21 as build1
 
 # define build arguments, as buildah needs them after the FROM
 ARG VERSION
@@ -47,7 +47,7 @@ RUN CGO_ENABLED=0 GO111MODULE=on go build -v -o cex-plugin \
 
 # cex-prometheus-exporter build to build2
 
-FROM golang:1.18 as build2
+FROM golang:1.21 as build2
 
 # define build arguments, as buildah needs them after the FROM
 ARG VERSION
