@@ -58,12 +58,12 @@ type CryptoConfig struct {
 }
 
 type CryptoConfigSet struct {
-	SetName   string    `json:"setname"`
-	Project   string    `json:"project"`
-	CexMode   string    `json:"cexmode"`
-	MinCexGen string    `json:"mincexgen"`
-	Overcommit int      `json:"overcommit"`
-	APQNDefs  []APQNDef `json:"apqns"`
+	SetName    string    `json:"setname"`
+	Project    string    `json:"project"`
+	CexMode    string    `json:"cexmode"`
+	MinCexGen  string    `json:"mincexgen"`
+	Overcommit int       `json:"overcommit"`
+	APQNDefs   []APQNDef `json:"apqns"`
 }
 
 type APQNDef struct {
@@ -166,7 +166,7 @@ func (cc CryptoConfig) Verify() bool {
 		// check optional overcommit limit
 		if s.Overcommit > 0 {
 			log.Printf("%s Optional overcommit limit %d specified in config set\n",
-					prestr, s.Overcommit)
+				prestr, s.Overcommit)
 		}
 		// check APQNDefs
 		for k, a := range s.APQNDefs {

@@ -48,7 +48,7 @@ func getenvint(envvar string, defaultval, minval int) int {
 	if isset {
 		valint, err := strconv.Atoi(valstr)
 		if err != nil {
-		      log.Printf("Podlister: Invalid setting for %s: %q.  Using default value...\n", envvar, err)
+			log.Printf("Podlister: Invalid setting for %s: %q.  Using default value...\n", envvar, err)
 			return defaultval
 		}
 		if valint < minval {
@@ -151,8 +151,8 @@ func TestCryptoConfigVerification(t *testing.T) {
 			config: CryptoConfig{
 				CryptoConfigSets: []*CryptoConfigSet{
 					&CryptoConfigSet{
-						SetName: "set",
-						Project: "test",
+						SetName:   "set",
+						Project:   "test",
 						MinCexGen: "cex456789",
 					},
 				},
@@ -170,7 +170,7 @@ func TestCryptoConfigVerification(t *testing.T) {
 						APQNDefs: []APQNDef{
 							APQNDef{
 								Adapter: -1,
-								Domain: 0,
+								Domain:  0,
 							},
 						},
 					},
@@ -188,7 +188,7 @@ func TestCryptoConfigVerification(t *testing.T) {
 						APQNDefs: []APQNDef{
 							APQNDef{
 								Adapter: 4711,
-								Domain: 0,
+								Domain:  0,
 							},
 						},
 					},
@@ -207,7 +207,7 @@ func TestCryptoConfigVerification(t *testing.T) {
 						APQNDefs: []APQNDef{
 							APQNDef{
 								Adapter: 0,
-								Domain: -1,
+								Domain:  -1,
 							},
 						},
 					},
@@ -225,7 +225,7 @@ func TestCryptoConfigVerification(t *testing.T) {
 						APQNDefs: []APQNDef{
 							APQNDef{
 								Adapter: 0,
-								Domain: 4711,
+								Domain:  4711,
 							},
 						},
 					},
@@ -244,11 +244,11 @@ func TestCryptoConfigVerification(t *testing.T) {
 						APQNDefs: []APQNDef{
 							APQNDef{
 								Adapter: 0,
-								Domain: 0,
+								Domain:  0,
 							},
 							APQNDef{
 								Adapter: 0,
-								Domain: 0,
+								Domain:  0,
 							},
 						},
 					},
@@ -267,7 +267,7 @@ func TestCryptoConfigVerification(t *testing.T) {
 						APQNDefs: []APQNDef{
 							APQNDef{
 								Adapter: 0,
-								Domain: 0,
+								Domain:  0,
 							},
 						},
 					},
@@ -277,7 +277,7 @@ func TestCryptoConfigVerification(t *testing.T) {
 						APQNDefs: []APQNDef{
 							APQNDef{
 								Adapter: 0,
-								Domain: 0,
+								Domain:  0,
 							},
 						},
 					},
@@ -291,47 +291,47 @@ func TestCryptoConfigVerification(t *testing.T) {
 			config: CryptoConfig{
 				CryptoConfigSets: []*CryptoConfigSet{
 					&CryptoConfigSet{
-						SetName: "set1",
-						Project: "test",
-						CexMode: "cca",
-						MinCexGen: "cex7",
+						SetName:    "set1",
+						Project:    "test",
+						CexMode:    "cca",
+						MinCexGen:  "cex7",
 						Overcommit: 10,
 						APQNDefs: []APQNDef{
 							APQNDef{
-								Adapter: 0,
-								Domain: 0,
+								Adapter:   0,
+								Domain:    0,
 								MachineId: "1",
 							},
 							APQNDef{
-								Adapter: 0,
-								Domain: 0,
+								Adapter:   0,
+								Domain:    0,
 								MachineId: "2",
 							},
 						},
 					},
 					&CryptoConfigSet{
-						SetName: "set2",
-						Project: "test",
-						CexMode: "ep11",
-						MinCexGen: "cex6",
+						SetName:    "set2",
+						Project:    "test",
+						CexMode:    "ep11",
+						MinCexGen:  "cex6",
 						Overcommit: 0,
 						APQNDefs: []APQNDef{
 							APQNDef{
 								Adapter: 0,
-								Domain: 2,
+								Domain:  2,
 							},
 						},
 					},
 					&CryptoConfigSet{
-						SetName: "set3",
-						Project: "other_test",
-						CexMode: "accel",
-						MinCexGen: "cex4",
+						SetName:    "set3",
+						Project:    "other_test",
+						CexMode:    "accel",
+						MinCexGen:  "cex4",
 						Overcommit: 1,
 						APQNDefs: []APQNDef{
 							APQNDef{
 								Adapter: 1,
-								Domain: 2,
+								Domain:  2,
 							},
 						},
 					},
@@ -348,7 +348,7 @@ func TestCryptoConfigVerification(t *testing.T) {
 	}
 }
 
-func equalSliceContentNoOrder(a, b[]string) bool {
+func equalSliceContentNoOrder(a, b []string) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -403,7 +403,7 @@ func TestCryptoConfigSetNames(t *testing.T) {
 		},
 		// We allow a nil receiver
 		{
-			cc: nil,
+			cc:   nil,
 			name: "nil",
 			sets: []string{},
 		},
@@ -440,10 +440,10 @@ func TestCryptoConfigGetSet(t *testing.T) {
 			},
 			name: "four numbered sets",
 			sets: map[string]int{
-				"set0": 0,
-				"set1": 1,
-				"set2": 2,
-				"set3": 3,
+				"set0":        0,
+				"set1":        1,
+				"set2":        2,
+				"set3":        3,
 				"notexisting": -1,
 			},
 		},
@@ -458,7 +458,7 @@ func TestCryptoConfigGetSet(t *testing.T) {
 		},
 		// We allow a nil receiver
 		{
-			cc: nil,
+			cc:   nil,
 			name: "nil",
 			sets: map[string]int{
 				"set0": -1,
@@ -495,13 +495,13 @@ func TestCryptoConfigSetForThisAPQN(t *testing.T) {
 						Project: "test",
 						APQNDefs: []APQNDef{
 							APQNDef{
-								Adapter: 0,
-								Domain: 0,
+								Adapter:   0,
+								Domain:    0,
 								MachineId: "1",
 							},
 							APQNDef{
 								Adapter: 0,
-								Domain: 1,
+								Domain:  1,
 							},
 						},
 					},
@@ -510,8 +510,8 @@ func TestCryptoConfigSetForThisAPQN(t *testing.T) {
 						Project: "test",
 						APQNDefs: []APQNDef{
 							APQNDef{
-								Adapter: 0,
-								Domain: 0,
+								Adapter:   0,
+								Domain:    0,
 								MachineId: "2",
 							},
 						},
@@ -521,45 +521,45 @@ func TestCryptoConfigSetForThisAPQN(t *testing.T) {
 			name: "big test",
 			apqns: []TestAPQN{
 				TestAPQN{
-					adapter: 0,
-					domain: 0,
+					adapter:   0,
+					domain:    0,
 					machineid: "1",
-					setidx: 0,
+					setidx:    0,
 				},
 				TestAPQN{
 					adapter: 0,
-					domain: 1,
-					setidx: 0,
+					domain:  1,
+					setidx:  0,
 				},
 				TestAPQN{
-					adapter: 0,
-					domain: 0,
+					adapter:   0,
+					domain:    0,
 					machineid: "2",
-					setidx: 1,
+					setidx:    1,
 				},
 				TestAPQN{
-					adapter: 0,
-					domain: 0,
+					adapter:   0,
+					domain:    0,
 					machineid: "3",
-					setidx: -1,
+					setidx:    -1,
 				},
 				TestAPQN{
 					adapter: 1,
-					domain: 0,
-					setidx: -1,
+					domain:  0,
+					setidx:  -1,
 				},
 			},
 		},
 		// We allow a nil receiver
 		{
-			cc: nil,
+			cc:   nil,
 			name: "nil",
 			apqns: []TestAPQN{
 				TestAPQN{
-					adapter: 0,
-					domain: 0,
+					adapter:   0,
+					domain:    0,
 					machineid: "",
-					setidx: -1,
+					setidx:    -1,
 				},
 			},
 		},

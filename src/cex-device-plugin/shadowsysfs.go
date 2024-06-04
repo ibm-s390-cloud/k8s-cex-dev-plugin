@@ -32,8 +32,8 @@ import (
 )
 
 const (
-	apbusdir      = "/sys/bus/ap"
-	apdevsdir     = "/sys/devices/ap"
+	apbusdir  = "/sys/bus/ap"
+	apdevsdir = "/sys/devices/ap"
 )
 
 var shadowbasedir = getenvstring("SHADOWSYSFS_BASEDIR", "/var/tmp/shadowsysfs", dirExistsWritable)
@@ -50,10 +50,10 @@ func getenvstring(envvar, defaultval string, check func(string, string)) string 
 func dirExistsWritable(d, envvar string) {
 	fi, err := os.Stat(d)
 	if err != nil {
-		log.Fatalf("Shadowsysfs: Invalid %s setting: %s: %v", envvar, d, err);
+		log.Fatalf("Shadowsysfs: Invalid %s setting: %s: %v", envvar, d, err)
 	}
-	if !fi.IsDir() || (fi.Mode() & 0700 != 0700) {
-		log.Fatalf("Shadowsysfs: Invalid %s setting: %s: Permissions do not include 0700", envvar, d);
+	if !fi.IsDir() || (fi.Mode()&0700 != 0700) {
+		log.Fatalf("Shadowsysfs: Invalid %s setting: %s: Permissions do not include 0700", envvar, d)
 	}
 }
 
