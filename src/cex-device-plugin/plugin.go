@@ -38,8 +38,8 @@ const (
 )
 
 var (
-	apqnOverCommitLimit = getenvint("APQN_OVERCOMMIT_LIMIT", 1, 1)                // overcommit limit: 1 is no overcommit
-	apqnsCheckInterval  = time.Duration(getenvint("APQN_CHECK_INTERVAL", 30, 10)) // device health check interval in seconds
+	apqnOverCommitLimit = getenvint("APQN_OVERCOMMIT_LIMIT", 1, 1, 100)                // overcommit limit: 1 is no overcommit
+	apqnsCheckInterval  = time.Duration(getenvint("APQN_CHECK_INTERVAL", 30, 10, 120)) // device health check interval in seconds
 )
 
 type ZCryptoDPMLister struct {

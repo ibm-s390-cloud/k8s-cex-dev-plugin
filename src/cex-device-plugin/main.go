@@ -25,6 +25,7 @@ import (
 	"flag"
 	"log"
 	"os"
+	"strconv"
 )
 
 var (
@@ -34,6 +35,33 @@ var (
 
 	MachineId = ""
 )
+
+func getenvstr(envvar, defaultval string) string {
+	valstr, isset := os.LookupEnv(envvar)
+	if isset {
+		return valstr
+	}
+	return defaultval
+}
+
+func getenvint(envvar string, defaultval, minval, maxval int) int {
+	valstr, isset := os.LookupEnv(envvar)
+	if isset {
+		valint, err := strconv.Atoi(valstr)
+		if err != nil {
+			log.Printf("Main: Invalid setting for %s: %q.  Using default value...\n", envvar, err)
+			return defaultval
+		}
+		if valint < minval {
+			return minval
+		}
+		if valint > maxval {
+			return maxval
+		}
+		return valint
+	}
+	return defaultval
+}
 
 func main() {
 

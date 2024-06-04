@@ -36,10 +36,10 @@ import (
 )
 
 var (
-	mcPollTime                = time.Duration(getenvint("METRICS_POLL_INTERVAL", 15, 10))
+	mcPollTime                = time.Duration(getenvint("METRICS_POLL_INTERVAL", 15, 10, 60))
 	promExporterCollService   = getenvstr("CEX_PROM_EXPORTER_COLLECTOR_SERVICE", "cex-prometheus-exporter-collector-service")
 	promExporterCollNamespace = getenvstr("CEX_PROM_EXPORTER_COLLECTOR_SERVICE_NAMESPACE", "")
-	promExporterCollPort      = getenvint("CEX_PROM_EXPORTER_COLLECTOR_SERVICE_PORT", 12358, 0)
+	promExporterCollPort      = getenvint("CEX_PROM_EXPORTER_COLLECTOR_SERVICE_PORT", 12358, 0, 65535)
 	conTCPTimeout             = 5 * time.Second // connect, read and write timeout for the TCP connection
 )
 

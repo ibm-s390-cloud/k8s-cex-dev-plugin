@@ -51,7 +51,7 @@ var (
 	tick *time.Ticker
 )
 
-var Cccheckinterval = time.Duration(getenvint("CRYPTOCONFIG_CHECK_INTERVAL", 120, 120))
+var Cccheckinterval = time.Duration(getenvint("CRYPTOCONFIG_CHECK_INTERVAL", 120, 30, 300))
 
 type CryptoConfig struct {
 	CryptoConfigSets []*CryptoConfigSet `json:"cryptoconfigsets"`

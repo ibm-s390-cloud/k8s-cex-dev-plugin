@@ -43,16 +43,19 @@ type TestAPQN struct {
 }
 
 // Have to provide this to remove some dependencies.
-func getenvint(envvar string, defaultval, minval int) int {
+func getenvint(envvar string, defaultval, minval, maxval int) int {
 	valstr, isset := os.LookupEnv(envvar)
 	if isset {
 		valint, err := strconv.Atoi(valstr)
 		if err != nil {
-			log.Printf("Podlister: Invalid setting for %s: %q.  Using default value...\n", envvar, err)
+			log.Printf("Invalid setting for %s: %q.  Using default value...\n", envvar, err)
 			return defaultval
 		}
 		if valint < minval {
 			return minval
+		}
+		if valint > maxval {
+			return maxval
 		}
 		return valint
 	}
