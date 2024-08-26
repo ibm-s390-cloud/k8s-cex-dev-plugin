@@ -17,9 +17,11 @@
 # Author(s): Harald Freudenberger <freude@de.ibm.com>
 #
 
-# cex-device-plugin build to build1
+# define image to build cex-device-plugin & cex-prometheus-exporter
+ARG BUILD_IMAGE=registry.hub.docker.com/library/golang:1.21
 
-FROM golang:1.21 as build1
+# cex-device-plugin build to build1
+FROM ${BUILD_IMAGE} as build1
 
 # define build arguments, as buildah needs them after the FROM
 ARG VERSION
@@ -47,7 +49,7 @@ RUN CGO_ENABLED=0 GO111MODULE=on go build -v -o cex-plugin \
 
 # cex-prometheus-exporter build to build2
 
-FROM golang:1.21 as build2
+FROM ${BUILD_IMAGE} as build2
 
 # define build arguments, as buildah needs them after the FROM
 ARG VERSION
