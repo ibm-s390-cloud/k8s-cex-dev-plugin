@@ -23,7 +23,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
@@ -139,7 +138,7 @@ func makeShadowApSysfs(id string, livesysfs, adapter, domain int) (string, strin
 	makefile := func(filename, content string) error {
 		//fmt.Printf("debug: makefile(%s)\n", filename)
 		rawdata := []byte(content)
-		err := ioutil.WriteFile(filename, rawdata, 0444)
+		err := os.WriteFile(filename, rawdata, 0444)
 		if err != nil {
 			log.Printf("Shadowsysfs: failed to write shadow sysfs file %s: %s\n", filename, err)
 			return fmt.Errorf("Shadowsysfs: Failed to write shadow sysfs file %s: %s", filename, err)
@@ -171,12 +170,12 @@ func makeShadowApSysfs(id string, livesysfs, adapter, domain int) (string, strin
 	}
 	copyfile := func(src, dst string) error {
 		//fmt.Printf("debug: copyfile(%s,%s)\n", src, dst)
-		rawdata, err := ioutil.ReadFile(src)
+		rawdata, err := os.ReadFile(src)
 		if err != nil {
 			log.Printf("Shadowsysfs: failed to read sysfs file %s: %s\n", src, err)
 			return fmt.Errorf("Shadowsysfs: Failed to read sysfs file %s: %s", src, err)
 		}
-		err = ioutil.WriteFile(dst, rawdata, 0444)
+		err = os.WriteFile(dst, rawdata, 0444)
 		if err != nil {
 			log.Printf("Shadowsysfs: failed to write shadow sysfs file %s: %s\n", dst, err)
 			return fmt.Errorf("Shadowsysfs: Failed to write shadow sysfs file %s: %s", dst, err)
@@ -412,7 +411,7 @@ func shadowFetchActiveShadows() ([]string, error) {
 		return shadowdirs, nil
 	}
 
-	files, err := ioutil.ReadDir(shadowbasedir)
+	files, err := os.ReadDir(shadowbasedir)
 	if err != nil {
 		log.Printf("Shadowsysfs: Can't read directory %s: %s\n", shadowbasedir, err)
 		return nil, fmt.Errorf("Shadowsysfs: Can't read directory %s: %s", shadowbasedir, err)

@@ -26,7 +26,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
@@ -128,7 +127,7 @@ func apScanCardDir(carddir string) (APQNList, error) {
 
 	var apqns APQNList
 
-	files, err := ioutil.ReadDir(apsysfsdevsdir + "/" + carddir)
+	files, err := os.ReadDir(apsysfsdevsdir + "/" + carddir)
 	if err != nil {
 		log.Printf("Ap: Error reading card directory '%s': %s\n", carddir, err)
 		return nil, fmt.Errorf("Ap: Error reading card directory '%s': %w", carddir, err)
@@ -188,7 +187,7 @@ func apScanAPQNs(verbose bool) (APQNList, error) {
 	var apqns APQNList
 
 	// scan ap bus dirs and fetch available apqns
-	files, err := ioutil.ReadDir(apsysfsdevsdir)
+	files, err := os.ReadDir(apsysfsdevsdir)
 	if err != nil {
 		log.Printf("Ap: Error reading AP devices sysfs dir: %s\n", err)
 		return nil, err

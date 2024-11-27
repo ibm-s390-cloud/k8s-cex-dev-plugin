@@ -28,7 +28,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
@@ -347,7 +346,7 @@ func ccReadConfigFile() (*CryptoConfig, error) {
 	}
 	defer config.Close()
 
-	rawdata, err := ioutil.ReadAll(config)
+	rawdata, err := io.ReadAll(config)
 	if err != nil {
 		log.Printf("CryptoConfig: Error reading config file '%s': %s\n", configfile, err)
 		return nil, fmt.Errorf("CryptoConfig: Error reading config file '%s': %w", configfile, err)

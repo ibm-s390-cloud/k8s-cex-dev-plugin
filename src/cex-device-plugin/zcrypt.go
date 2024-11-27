@@ -23,7 +23,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
@@ -268,7 +267,7 @@ func zcryptFetchActiveNodes() ([]string, error) {
 		return nodes, nil
 	}
 
-	files, err := ioutil.ReadDir(zcryptvdevdir)
+	files, err := os.ReadDir(zcryptvdevdir)
 	if err != nil {
 		log.Printf("Zcrypt: Can't read directory %s: %s\n", zcryptvdevdir, err)
 		return nil, fmt.Errorf("Zcrypt: Can't read directory %s: %s", zcryptvdevdir, err)
