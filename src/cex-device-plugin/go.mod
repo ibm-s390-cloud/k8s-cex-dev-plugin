@@ -13,9 +13,9 @@ require (
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v1.2.0 // indirect
-	golang.org/x/net v0.26.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
-	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	k8s.io/utils v0.0.0-20230406110748-d93618cff8a2 // indirect
