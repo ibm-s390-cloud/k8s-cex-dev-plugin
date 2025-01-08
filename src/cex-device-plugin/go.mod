@@ -1,6 +1,6 @@
 module cex-plugin
 
-go 1.21
+go 1.22
 
 require (
 	github.com/kubevirt/device-plugin-manager v1.19.4

@@ -16,7 +16,7 @@
 # Author(s): Harald Freudenberger <freude@de.ibm.com>
 #
 
-FROM golang:1.21 as build
+FROM golang:1.22 as build
 
 # define build arguments, as buildah needs them after the FROM
 ARG VERSION
