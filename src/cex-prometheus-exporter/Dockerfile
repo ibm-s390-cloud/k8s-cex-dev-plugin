@@ -16,12 +16,17 @@
 # Author(s): Harald Freudenberger <freude@de.ibm.com>
 #
 
-FROM golang:1.22 as build
+ARG BUILD_IMAGE=registry.hub.docker.com/library/golang:1.22
+
+FROM ${BUILD_IMAGE} as build
 
 # define build arguments, as buildah needs them after the FROM
 ARG VERSION
 ARG GIT_URL
 ARG GIT_COMMIT
+
+# some images set the user explicitly, revert to root for building
+USER root
 
 # make build dir /build
 WORKDIR /build
