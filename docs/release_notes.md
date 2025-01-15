@@ -72,6 +72,21 @@ in a dependent library:
 The code has been rebuilt with upgrade of the go language to 1.21 and updated
 libraries because of minor complains by quay.io and github at dependent libraries.
 
+## Version 1.2.0
+
+Version 1.2.0 is a minor release with one new feature: live-sysfs support (see
+below). Also the go build has been updated to go language version 1.22 and some
+of the depentent libraries where updated because of CVE findings
+(golang.org/x/net update to v0.33.0, grpc update to 1.64.1).
+
+### Features
+
+Live sysfs support within the shadow sysfs: With *live sysfs support* enabled
+some of the files shadowed to the directories `/sys/bus/ap` and
+`/sys/devices/ap` become alive. For example `online` attribute reflects the real
+state of this APQN of the providing host node. More details can be found in the
+CEX-plugin documentation.
+
 ## Known issues
 
 There are no known issues. See
