@@ -379,6 +379,7 @@
 | Name | Default value | Description |
 |:-----|:--------------|:-------|
 `APQN_CHECK_INTERVAL` | `30` | The interval in seconds to check for the node APQNs available and their health state. The minimum is 10 seconds.
+`APQN_LIVE_SYSFS` | `1` | Enables (1) or disables (0) *live sysfs support*. If empty (the default) `1` is assumed and thus live sysfs support is enabled. For details see [Live sysfs support within the shadow sysfs](technical_concepts_limitations.md#live-sysfs-support-within-the-shadow-sysfs)
 `APQN_OVERCOMMIT_LIMIT` | `1` | The overcommit limit, `1` defines no overcommit. For details see [Overcommitment of CEX resources](technical_concepts_limitations.md#overcommitment-of-cex-resources)
 `CEX_PROM_EXPORTER_COLLECTOR_SERVICE_NAMESPACE` | | The namespace in which the CEX Prometheus exporter will run. If empty (the default) it is assumed that CEX plug-in instances and the CEX Prometheus exporter run in the same namespace.
 `CEX_PROM_EXPORTER_COLLECTOR_SERVICE_PORT` | `12358` | The port number where the CEX plug-in instances will contact the CEX Prometheus exporter to deliver their raw metrics data.

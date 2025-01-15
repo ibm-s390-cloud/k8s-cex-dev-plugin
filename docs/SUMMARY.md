@@ -24,6 +24,7 @@ Crypto Express (CEX) cards available for IBM Z and LinuxONE (s390x).
     * [Overcommitment of CEX resources](technical_concepts_limitations.md#overcommitment-of-cex-resources)
     * [The device node z90crypt](technical_concepts_limitations.md#the-device-node-z90crypt)
     * [The shadow sysfs](technical_concepts_limitations.md#the-shadow-sysfs)
+      * [Live sysfs support within the shadow sysfs](technical_concepts_limitations.md#live-sysfs-support-within-the-shadow-sysfs)
     * [Hot plug and hot unplug of APQNs](technical_concepts_limitations.md#hot-plug-and-hot-unplug-of-apqns)
     * [SELinux and the Init Container](technical_concepts_limitations.md#selinux-and-the-init-container)
     * [Limitations](technical_concepts_limitations.md#limitations)
