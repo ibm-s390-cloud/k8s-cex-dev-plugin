@@ -16,7 +16,7 @@
 # Author(s): Harald Freudenberger <freude@de.ibm.com>
 #
 
-ARG BUILD_IMAGE=registry.hub.docker.com/library/golang:1.22
+ARG BUILD_IMAGE=registry.hub.docker.com/library/golang:1.23
 
 FROM ${BUILD_IMAGE} as build
 

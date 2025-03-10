@@ -18,7 +18,7 @@
 #
 
 # define image to build cex-device-plugin & cex-prometheus-exporter
-ARG BUILD_IMAGE=registry.hub.docker.com/library/golang:1.22
+ARG BUILD_IMAGE=registry.hub.docker.com/library/golang:1.23
 
 # cex-device-plugin build to build1
 FROM ${BUILD_IMAGE} as build1
