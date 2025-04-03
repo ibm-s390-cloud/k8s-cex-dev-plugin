@@ -87,6 +87,10 @@ some of the files shadowed to the directories `/sys/bus/ap` and
 state of this APQN of the providing host node. More details can be found in the
 CEX-plugin documentation.
 
+## Version 1.2.1
+
+Updated Go to version 1.23 and upgraded several dependencies, including github.com/golang/glog to v1.2.4 and golang.org/x/net to v0.37.0, to address known security vulnerabilities (CVEs) they contained.
+
 ## Known issues
 
 There are no known issues. See
