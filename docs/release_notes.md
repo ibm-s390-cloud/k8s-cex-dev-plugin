@@ -37,35 +37,38 @@ This update includes one new feature:
 
 ## Version 1.1.0
 
-The new version 1.1.0 of the Kubernetes device plug-in for IBM Crypto Express
-(CEX) cards includes the exploration of Prometheus metrics around the crypto
-resources managed by the plug-in. It also comes with support for *OCP 4.12* with
-enforced *Security Context Constrains (SCC)*. By default the CEX device plugin
-now installes into it's own namespace *cex-device-plugin* and all the
+Version 1.1.0 of the Kubernetes device plug-in for IBM Crypto Express (CEX)
+cards includes the exploration of Prometheus metrics around the crypto resources 
+that are managed by the plug-in.
+This release adds support for *Red Hat OpenShift Container Platform 4.12* with
+enforced *Security Context Constraints (SCC)*. By default, the CEX device plug-in
+now installes into its own namespace *cex-device-plugin* and all the
 deployments have been rearranged for *Kustomize* support to make it easier to
-create and update the CEX device plugin entities.
+create and update the CEX device plug-in entities.
 
 ### Features
 
-- Prometheus metrics support
-- New namespace 'cex-device-plugin' (See
-  [Migrating from kube-system to cex-device-plugin Namespace](migration.md))
-- Enabled for OCP 4.12 with enforced SCC support
-- Kustimize support
+The following features are included in this release:
+
+* Prometheus metrics support
+* New namespace 'cex-device-plugin' For details see: 
+  [Migrating from kube-system to cex-device-plugin namespace](migration.md#migrating-from-kube-system-to-cex-device-plugin-namespace)
+* Enabled for RHOCP 4.12 with enforced SCC support 
+* Kustomize support
 
 ### Resolved issues
 
-The code has been rebuild with updated libraries because of CVE findings in
-libraries the CEX device plug-in depends on:
-- CVE-2022-3172 (Medium) in k8s.io/apiMachinery-v0.20.4
-- CVE-2022-21698 (High) in github.com/prometheus/client_goLang-v1.11.0
-- CVE-2022-32149 (High) in golang.org/x/text-v0.3.4
+The code has been rebuilt with updated libraries because of CVE findings in
+libraries that the CEX device plug-in depends on:
+* CVE-2022-3172 (Medium) in k8s.io/apiMachinery-v0.20.4
+* CVE-2022-21698 (High) in github.com/prometheus/client_goLang-v1.11.0
+* CVE-2022-32149 (High) in golang.org/x/text-v0.3.4
 
 ## Version 1.1.1
 
 The code has been rebuilt with updated libraries because of a CVE finding
 in a dependent library:
-- CVE-2023-39325 (High) in golang.org/x/net-v0.9.0 (see [https://nvd.nist.gov/vuln/detail/CVE-2023-39325](https://nvd.nist.gov/vuln/detail/CVE-2023-39325))
+* CVE-2023-39325 (High) in golang.org/x/net-v0.9.0 (see [https://nvd.nist.gov/vuln/detail/CVE-2023-39325](https://nvd.nist.gov/vuln/detail/CVE-2023-39325))
 
 ## Version 1.1.2
 
@@ -74,15 +77,15 @@ libraries because of minor complains by quay.io and github at dependent librarie
 
 ## Version 1.2.0
 
-Version 1.2.0 is a minor release with one new feature: live-sysfs support (see
-below). Also the go build has been updated to go language version 1.22 and some
-of the depentent libraries where updated because of CVE findings
+Version 1.2.0 is a minor release with one new feature: live-sysfs support 
+(see below). Also, the go build has been updated to go language version 1.22 
+and some dependent libraries where updated because of CVE findings 
 (golang.org/x/net update to v0.33.0, grpc update to 1.64.1).
 
 ### Features
 
 Live sysfs support within the shadow sysfs: With *live sysfs support* enabled
-some of the files shadowed to the directories `/sys/bus/ap` and
+some files shadowed to the directories `/sys/bus/ap` and
 `/sys/devices/ap` become alive. For example `online` attribute reflects the real
 state of this APQN of the providing host node. More details can be found in the
 CEX-plugin documentation.
@@ -90,6 +93,10 @@ CEX-plugin documentation.
 ## Version 1.2.1
 
 Updated Go to version 1.23 and upgraded several dependencies, including github.com/golang/glog to v1.2.4 and golang.org/x/net to v0.37.0, to address known security vulnerabilities (CVEs) they contained.
+
+## Version 1.2.2
+
+Updated golang.org/x/net to v0.38.0 to address known security vulnerabilities (CVEs).
 
 ## Known issues
 
