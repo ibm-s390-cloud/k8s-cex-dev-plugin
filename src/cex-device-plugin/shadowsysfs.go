@@ -32,31 +32,9 @@ import (
 	kdp "k8s.io/kubelet/pkg/apis/deviceplugin/v1beta1"
 )
 
-const (
-	apbusdir  = "/sys/bus/ap"
-	apdevsdir = "/sys/devices/ap"
-)
-
-var shadowbasedir = getenvstring("SHADOWSYSFS_BASEDIR", "/var/tmp/shadowsysfs", dirExistsWritable)
-
-func getenvstring(envvar, defaultval string, check func(string, string)) string {
-	val, isset := os.LookupEnv(envvar)
-	if !isset {
-		val = defaultval
-	}
-	check(val, envvar)
-	return val
-}
-
-func dirExistsWritable(d, envvar string) {
-	fi, err := os.Stat(d)
-	if err != nil {
-		log.Fatalf("Shadowsysfs: Invalid %s setting: %s: %v", envvar, d, err)
-	}
-	if !fi.IsDir() || (fi.Mode()&0700 != 0700) {
-		log.Fatalf("Shadowsysfs: Invalid %s setting: %s: Permissions do not include 0700", envvar, d)
-	}
-}
+var apbusdir = getenvstr("APSYSFS_BUSDIR", "/sys/bus/ap")
+var apdevsdir = getenvstr("APSYSFS_DEVSDIR", "/sys/devices/ap")
+var shadowbasedir = getenvstr("SHADOWSYSFS_BASEDIR", "/var/tmp/shadowsysfs")
 
 // sys/bus/ap
 var sys_bus_ap_copyfiles = []string{
@@ -115,6 +93,29 @@ var sys_devices_ap_queue_fileswithvalue = []struct{ name, value string }{
 	{"pendingq_count", "0\n"},
 	{"request_count", "0\n"},
 	{"requestq_count", "0\n"},
+}
+
+func shadowSysfsInit() bool {
+
+	info, err := os.Stat(shadowbasedir)
+	if os.IsNotExist(err) {
+		err := os.MkdirAll(shadowbasedir, 0755)
+		if err != nil {
+			log.Printf("Shadowsysfs: Failure on creating base directory %s: %v\n", shadowbasedir, err)
+			return false
+		}
+		log.Printf("Shadowsysfs: Base directory %s created\n", shadowbasedir)
+		return true
+	} else if err != nil {
+		log.Printf("Shadowsysfs: Invalid base dir %s: %v\n", shadowbasedir, err)
+		return false
+	}
+	if !info.IsDir() || (info.Mode()&0700 != 0700) {
+		log.Printf("Shadowsysfs: Invalid base dir %s: no directory or invalid permissions\n", shadowbasedir)
+		return false
+	}
+
+	return true
 }
 
 func makeShadowApSysfs(id string, livesysfs, adapter, domain int) (string, string, error) {

@@ -33,11 +33,12 @@ import (
 )
 
 const (
-	apsysfsdir     = "/sys/bus/ap"
-	apsysfsdevsdir = "/sys/devices/ap"
 	// Estimate how much space an APQN requires when printing
 	apqnstringestimate = 6 + 3 + 3 + 4 + 5 + 1
 )
+
+var apsysfsdir = getenvstr("APSYSFS_BUSDIR", "/sys/bus/ap")
+var apsysfsdevsdir = getenvstr("APSYSFS_DEVSDIR", "/sys/devices/ap")
 
 type APQN struct {
 	Adapter int    `json:"adapter"`
@@ -70,9 +71,9 @@ func apHasApSupport() bool {
 	_, err := os.Stat(apsysfsdir)
 	if err != nil {
 		if os.IsNotExist(err) {
-			log.Printf("Ap: No AP bus support (AP bus sysfs dir does not exist)\n")
+			log.Printf("Ap: No AP bus support (AP bus sysfs dir %s does not exist)\n", apsysfsdir)
 		} else {
-			log.Printf("Ap: Error reading AP bus sysfs dir: %s\n", err)
+			log.Printf("Ap: Error reading AP bus sysfs dir %s: %v\n", apsysfsdir, err)
 		}
 		return false
 	}

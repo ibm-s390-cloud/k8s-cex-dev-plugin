@@ -112,6 +112,11 @@ func main() {
 		log.Fatalf("Main: Crypto configuration verification failed.\n")
 	}
 
+	// init shadowsysfs or die
+	if !shadowSysfsInit() {
+		log.Fatalf("Main: Initialization of shadow sysfs support failed\n")
+	}
+
 	// check for zcrypt multiple node support or die
 	if !zcryptHasNodesSupport() {
 		log.Fatalf("Main: No zcrypt multiple node support available\n")

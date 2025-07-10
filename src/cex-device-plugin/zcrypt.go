@@ -31,10 +31,11 @@ import (
 )
 
 const (
-	zcryptclassdir     = "/sys/class/zcrypt"
 	zcryptvdevdir      = "/sys/devices/virtual/zcrypt"
 	zcryptnodefilemode = 0666
 )
+
+var zcryptclassdir = getenvstr("ZCRYPT_CLASSDIR", "/sys/class/zcrypt")
 
 func zcryptHasNodesSupport() bool {
 

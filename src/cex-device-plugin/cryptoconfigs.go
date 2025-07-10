@@ -50,6 +50,8 @@ var (
 	tick *time.Ticker
 )
 
+var ccsfile = getenvstr("CCS_JSON_FILE", "/config/cex_resources.json")
+var sysinfofile = getenvstr("PROC_SYSINFO_FILE", "/proc/sysinfo")
 var Cccheckinterval = time.Duration(getenvint("CRYPTOCONFIG_CHECK_INTERVAL", 120, 30, 300))
 
 type CryptoConfig struct {
@@ -339,22 +341,22 @@ func ccReadConfigFile() (*CryptoConfig, error) {
 
 	var cc CryptoConfig
 
-	config, err := os.Open(configfile)
+	config, err := os.Open(ccsfile)
 	if err != nil {
-		log.Printf("CryptoConfig: Can't open config file '%s': %s\n", configfile, err)
-		return nil, fmt.Errorf("CryptoConfig: Can't open config file '%s': %w", configfile, err)
+		log.Printf("CryptoConfig: Can't open config file '%s': %s\n", ccsfile, err)
+		return nil, fmt.Errorf("CryptoConfig: Can't open config file '%s': %w", ccsfile, err)
 	}
 	defer config.Close()
 
 	rawdata, err := io.ReadAll(config)
 	if err != nil {
-		log.Printf("CryptoConfig: Error reading config file '%s': %s\n", configfile, err)
-		return nil, fmt.Errorf("CryptoConfig: Error reading config file '%s': %w", configfile, err)
+		log.Printf("CryptoConfig: Error reading config file '%s': %s\n", ccsfile, err)
+		return nil, fmt.Errorf("CryptoConfig: Error reading config file '%s': %w", ccsfile, err)
 	}
 
 	if err = json.Unmarshal(rawdata, &cc); err != nil {
-		log.Printf("CryptoConfig: Error parsing config file '%s': %s\n", configfile, err)
-		return nil, fmt.Errorf("CryptoConfig: Error parsing config file '%s': %w", configfile, err)
+		log.Printf("CryptoConfig: Error parsing config file '%s': %s\n", ccsfile, err)
+		return nil, fmt.Errorf("CryptoConfig: Error parsing config file '%s': %w", ccsfile, err)
 	}
 
 	return &cc, nil
@@ -365,7 +367,6 @@ func ccGetMachineId() (string, error) {
 	machineid := ""
 
 	// use /proc/sysinfo
-	sysinfofile := "/proc/sysinfo"
 	sysinfo, err := os.Open(sysinfofile)
 	if err != nil {
 		log.Printf("CryptoConfig: Can't open sysinfo file '%s': %s\n", sysinfofile, err)
@@ -423,15 +424,15 @@ func ccGetMachineId() (string, error) {
 }
 
 func ccGetTag() ([]byte, error) {
-	config, err := os.Open(configfile)
+	config, err := os.Open(ccsfile)
 	if err != nil {
-		log.Printf("CryptoConfig: Can't open config file '%s': %s\n", configfile, err)
-		return nil, fmt.Errorf("CryptoConfig: Can't open config file '%s': %w", configfile, err)
+		log.Printf("CryptoConfig: Can't open config file '%s': %s\n", ccsfile, err)
+		return nil, fmt.Errorf("CryptoConfig: Can't open config file '%s': %w", ccsfile, err)
 	}
 	defer config.Close()
 	h := sha256.New()
 	if _, err := io.Copy(h, config); err != nil {
-		return nil, fmt.Errorf("Could not generate tag for configuration file '%s': %w", configfile, err)
+		return nil, fmt.Errorf("Could not generate tag for configuration file '%s': %w", ccsfile, err)
 	}
 	return h.Sum(nil), nil
 }
