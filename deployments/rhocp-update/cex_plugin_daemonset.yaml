@@ -35,7 +35,7 @@ spec:
             mountPath: /var/tmp
       containers:
       - name: cex-plugin
-        image: 'quay.io/ibm/ibm-cex-plugin-cm:v1.2.2'
+        image: 'quay.io/ibm/ibm-cex-plugin-cm:v1.2.3'
         imagePullPolicy: Always
         securityContext:
           privileged: true

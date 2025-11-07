@@ -98,6 +98,10 @@ Updated Go to version 1.23 and upgraded several dependencies, including github.c
 
 Updated golang.org/x/net to v0.38.0 to address known security vulnerabilities (CVEs).
 
+## Version 1.2.3
+
+This minor release adds limited support for a mock runtime environment.
+
 ## Known issues
 
 There are no known issues. See
