@@ -156,16 +156,9 @@ func (p *ZCryptoResPlugin) makePluginDevsFromAPQNs() []*kdp.Device {
 
 	var devices []*kdp.Device
 
-	if p.ccset.Livesysfs == nil {
-		p.ccset.Livesysfs = &apqnLiveSysfs
-		log.Printf("Plugin['%s']: Livesysfs not specified in ConfigSet, using '%d'\n",
-			p.resource, apqnLiveSysfs)
-	}
-
-	if p.ccset.Overcommit <= 0 {
-		p.ccset.Overcommit = apqnOverCommitLimit
-		log.Printf("Plugin['%s']: Overcommit not specified in ConfigSet, fallback to %d \n",
-			p.resource, apqnOverCommitLimit)
+	// if the configset is empty, simple return an empty list
+	if p.ccset == nil {
+		return devices
 	}
 
 	for _, a := range p.apqns {
@@ -173,7 +166,7 @@ func (p *ZCryptoResPlugin) makePluginDevsFromAPQNs() []*kdp.Device {
 		if !a.Online {
 			health = kdp.Unhealthy
 		}
-		for i := 0; i < p.ccset.Overcommit; i++ {
+		for i := 0; i < max(1, p.ccset.Overcommit); i++ {
 			devices = append(devices, &kdp.Device{
 				ID:     fmt.Sprintf(ApqnFmtStr, a.Adapter, a.Domain, i),
 				Health: health,
@@ -189,7 +182,7 @@ func (p *ZCryptoResPlugin) checkChanged() bool {
 	//log.Printf("Plugin['%s']: checkChanged() rescanning available APQNs\n", p.resource)
 
 	var apqnsChanged, configChanged bool
-	ccset, tag := GetCurrentCryptoConfigSet(p.ccset, p.resource, p.tag)
+	ccset, tag := GetCurrentCryptoConfigSet(p.ccset, p.resource, p.tag) // caution: ccset may be nil
 
 	allnodeapqns, err := apScanAPQNs(false)
 	if err != nil {
@@ -205,17 +198,27 @@ func (p *ZCryptoResPlugin) checkChanged() bool {
 		apqnsChanged = true
 	}
 
+	// adjust the ConfigSet before comparing
+	if ccset != nil {
+		if ccset.Overcommit < 0 {
+			// no overcommit parameter given in this config set, so use default
+			ccset.Overcommit = apqnOverCommitLimit
+		}
+		if ccset.Livesysfs < 0 {
+			// no livesysfs parameter given in this config set, so use default
+			ccset.Livesysfs = apqnLiveSysfs
+		}
+	}
+
 	// check for overcommit change in ConfigSet
 	if ccset != nil && ccset.Overcommit != p.ccset.Overcommit {
-		log.Printf("Plugin['%s']: Rescan found changes in ConfigSet: overcommit limit has changed\n",
-			p.resource)
+		log.Printf("Plugin['%s']: Rescan found changes in ConfigSet: overcommit limit has changed\n", p.resource)
 		configChanged = true
 	}
 
 	// check for livesysfs change in ConfigSet
-	if ccset != nil && *ccset.Livesysfs != *p.ccset.Livesysfs {
-		log.Printf("Plugin['%s']: Rescan found changes in ConfigSet: livesysfs parameter has changed\n",
-			p.resource)
+	if ccset != nil && ccset.Livesysfs != p.ccset.Livesysfs {
+		log.Printf("Plugin['%s']: Rescan found changes in ConfigSet: livesysfs parameter has changed\n", p.resource)
 		configChanged = true
 	}
 
@@ -362,7 +365,7 @@ func (p *ZCryptoResPlugin) Allocate(ctx context.Context, req *kdp.AllocateReques
 			dev.Permissions = "rw"
 			carsp.Devices = append(carsp.Devices, dev)
 			// create AP bus and devices shadow sysfs for this container and mount them into the container
-			apbusdir, apdevsdir, err := makeShadowApSysfs(id, *p.ccset.Livesysfs, card, queue)
+			apbusdir, apdevsdir, err := makeShadowApSysfs(id, p.ccset.Livesysfs, card, queue)
 			if err != nil {
 				log.Printf("Plugin['%s']: Error creating shadow sysfs for device '%s': %s\n", p.resource, id, err)
 				defer zcryptDestroyNode(znode)
@@ -376,7 +379,7 @@ func (p *ZCryptoResPlugin) Allocate(ctx context.Context, req *kdp.AllocateReques
 				ContainerPath: "/sys/devices/ap",
 				HostPath:      apdevsdir,
 				ReadOnly:      true})
-			if *p.ccset.Livesysfs > 0 {
+			if p.ccset.Livesysfs > 0 {
 				err = addLiveMounts(id, &carsp, card, queue)
 				if err != nil {
 					log.Printf("Plugin['%s']: Error adding live mounts for device '%s': %s\n", p.resource, id, err)

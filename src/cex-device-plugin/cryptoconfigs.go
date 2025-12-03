@@ -59,13 +59,15 @@ type CryptoConfig struct {
 }
 
 type CryptoConfigSet struct {
-	SetName    string    `json:"setname"`
-	Project    string    `json:"project"`
-	CexMode    string    `json:"cexmode"`
-	MinCexGen  string    `json:"mincexgen"`
-	Overcommit int       `json:"overcommit"`
-	Livesysfs  *int      `json:"livesysfs,omitempty"`
-	APQNDefs   []APQNDef `json:"apqns"`
+	SetName     string    `json:"setname"`
+	Project     string    `json:"project"`
+	CexMode     string    `json:"cexmode"`
+	MinCexGen   string    `json:"mincexgen"`
+	_overcommit *int      `json:"overcommit,omitempty"` // intermediate field for parsing
+	Overcommit  int       `json:"-"`                    // -1 if not given, otherwise value of *_overcommit
+	_livesysfs  *int      `json:"livesysfs,omitempty"`  // intermediate field for parsing
+	Livesysfs   int       `json:"-"`                    // -1 if not given, otherwise value of *_livesysfs
+	APQNDefs    []APQNDef `json:"apqns"`
 }
 
 type APQNDef struct {
@@ -166,19 +168,28 @@ func (cc CryptoConfig) Verify() bool {
 			}
 		}
 		// check optional overcommit limit
-		if s.Overcommit > 0 {
-			log.Printf("%s Optional overcommit limit %d specified in config set\n",
+		s.Overcommit = -1 // -1 means no overcommit given, so use the default value
+		if s._overcommit != nil {
+			// accect values >= 0
+			if *s._overcommit < 0 {
+				log.Printf("%s Unknown/unsupported overcommit value '%d'\n", prestr, *s._overcommit)
+				return false
+			}
+			s.Overcommit = *s._overcommit
+			log.Printf("%s Optional 'overcommit = %d' parameter specified in config set\n",
 				prestr, s.Overcommit)
 		}
 		// check optional livesysfs parameter
-		if s.Livesysfs != nil {
+		s.Livesysfs = -1 // -1 means to use the default (see apqnLiveSysfs from plugin.go)
+		if s._livesysfs != nil {
 			// accect values >= 0, meaning 0: livesysfs disabled, > 0 livesysfs enabled
-			if *s.Livesysfs < 0 {
-				log.Printf("%s Unknown/unsupported livesysfs value '%d'\n", prestr, *s.Livesysfs)
+			if *s._livesysfs < 0 {
+				log.Printf("%s Unknown/unsupported livesysfs value '%d'\n", prestr, *s._livesysfs)
 				return false
 			}
+			s.Livesysfs = *s._livesysfs
 			log.Printf("%s Optional 'livesysfs = %d' parameter specified in config set\n",
-				prestr, *s.Livesysfs)
+				prestr, s.Livesysfs)
 		}
 		// check APQNDefs
 		for k, a := range s.APQNDefs {
@@ -235,10 +246,10 @@ func (cc CryptoConfig) PrettyLog() {
 		if len(e.MinCexGen) > 0 {
 			log.Printf("    mincexgen: '%s'\n", e.MinCexGen)
 		}
-		if e.Overcommit > 0 {
+		if e.Overcommit >= 0 {
 			log.Printf("    overcommit: %d\n", e.Overcommit)
 		}
-		if e.Livesysfs != nil {
+		if e.Livesysfs >= 0 {
 			log.Printf("    livesysfs: %d\n", e.Livesysfs)
 		}
 		n = len(e.APQNDefs)
