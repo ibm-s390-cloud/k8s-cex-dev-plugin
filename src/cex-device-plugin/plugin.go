@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"log"
 	"sort"
+	"sync"
 	"time"
 
 	"github.com/kubevirt/device-plugin-manager/pkg/dpm"
@@ -55,8 +56,9 @@ type ZCryptoResPlugin struct {
 	tag         []byte
 	apqns       APQNList
 	devices     []*kdp.Device
-	changedChan chan struct{}
 	stopChan    chan struct{}
+	changedChan chan struct{}
+	wgChChan    sync.WaitGroup // a wait group for the changed channel
 }
 
 func (l *ZCryptoDPMLister) GetResourceNamespace() string {
@@ -122,6 +124,7 @@ func (z *ZCryptoDPMLister) NewPlugin(resource string) dpm.PluginInterface {
 		resource: resource,
 		ccset:    ccset,
 		tag:      tag,
+		wgChChan: sync.WaitGroup{},
 	}
 	return p
 }
@@ -241,6 +244,9 @@ func (p *ZCryptoResPlugin) checkChangedLoop() {
 
 	tick := time.NewTicker(apqnsCheckInterval * time.Second)
 
+	// add one user (the for loop we will run into now) to the wait group
+	p.wgChChan.Add(1)
+
 ForLoop:
 	for {
 		select {
@@ -253,6 +259,9 @@ ForLoop:
 			}
 		}
 	}
+
+	// release our usage of the changed channel
+	p.wgChChan.Done()
 }
 
 func (p *ZCryptoResPlugin) Start() error {
@@ -286,7 +295,17 @@ func (p *ZCryptoResPlugin) Stop() error {
 
 	log.Printf("Plugin['%s']: Stop()\n", p.resource)
 
+	// clear apqns and plugin devices and tell metric collector about this
+	p.apqns = nil
+	p.tellMetricsCollAboutAPQNs()
+	p.devices = nil
+	p.tellMetricsCollAboutPluginDevs()
+
+	// close the stop channel and thus trigger listener of this channel to stop their work
 	close(p.stopChan)
+
+	// wait until all users of the changed channel are done, then close the changed channel
+	p.wgChChan.Wait()
 	close(p.changedChan)
 
 	return nil
