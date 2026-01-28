@@ -214,13 +214,13 @@ func (p *ZCryptoResPlugin) checkChanged() bool {
 	}
 
 	// check for overcommit change in ConfigSet
-	if ccset != nil && ccset.Overcommit != p.ccset.Overcommit {
+	if ccset != nil && (p.ccset == nil || ccset.Overcommit != p.ccset.Overcommit) {
 		log.Printf("Plugin['%s']: Rescan found changes in ConfigSet: overcommit limit has changed\n", p.resource)
 		configChanged = true
 	}
 
 	// check for livesysfs change in ConfigSet
-	if ccset != nil && ccset.Livesysfs != p.ccset.Livesysfs {
+	if ccset != nil && (p.ccset == nil || ccset.Livesysfs != p.ccset.Livesysfs) {
 		log.Printf("Plugin['%s']: Rescan found changes in ConfigSet: livesysfs parameter has changed\n", p.resource)
 		configChanged = true
 	}
