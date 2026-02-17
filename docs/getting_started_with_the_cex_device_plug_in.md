@@ -205,7 +205,7 @@ map from a given `cex_resources.json` file.
 2. Edit the `cex_resources.json` JSON file in the `deployments/configmap` folder
    with your favorite editor.
 3. To verify via pretty-print that you made valid JSON entries without errors,
-   run the following command: <br>`jq -r . cex_resources.json`<br>
-   If you see error messages, you need to fix them before continuing to the next step.
+   run the following command: <br>`jq -r . cex_resources.json`<br>.
+   If you see error messages, you need to resolve the errors before continuing to the next step.
 4. To create the configurtion map, run the following command: <br>`oc create -k .`<br>
    To update an already existing config map, run the following command: <br>`oc apply -k .`<br>

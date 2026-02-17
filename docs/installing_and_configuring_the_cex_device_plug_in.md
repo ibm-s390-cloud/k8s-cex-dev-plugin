@@ -33,7 +33,6 @@ Container Platform in the following directories:
 - `rhocp-update` an overlay to update the installation without touching an
   existing configmap
 - `configmap` an overlay to only update or create a configmap
-See [Getting started with the CEX device plug-in](getting_started_with_the_cex_device_plug_in.md) for details.
 OpenShift Container Platform including a configmap (directory
 `rhocp-create`), an overlay to update the installation without
 touching a (possibly existing) configmap (directory `rhocp-update`), and

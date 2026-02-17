@@ -1,9 +1,9 @@
 # Migrating from kube-system to cex-device-plugin Namespace
 
-This section describes how to move the CEX device plugin-in from the
+This section describes how to move the CEX device plugin from the
 `kube-system` namespace to its own namespace `cex-device-plugin`.
 
-## Migration Details
+## Migration details
 
 The migration basically corresponds to a re-installation of the CEX device
 plugin and the corresponding CEX resource configuration in the new

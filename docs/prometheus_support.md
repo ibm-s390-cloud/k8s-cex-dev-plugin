@@ -52,7 +52,7 @@ The following metrics are exposed:
 * Metric `cex_plugin_total_plugindevs_available`:
 
   A simple integer literal showing the total number of CEX plug-in
-  devices currently available in in the cluster. This metric gives
+  devices currently available in the cluster. This metric provides
   the sum of all `cex_plugin_plugindevs_available` over all
   crypto configsets and is provided only for convenience.
 
@@ -64,7 +64,7 @@ The following metrics are exposed:
 * Metric `cex_plugin_total_plugindevs_used`:
 
   A simple integer literal showing the total number of CEX plug-in
-  devices currently in use in the cluster. This metric gives the the
+  devices currently in use in the cluster. This metric provides the
   sum of all `cex_plugin_plugindevs_used` over all crypto configsets
   and is provided only for convenience.
 
@@ -77,7 +77,7 @@ The following metrics are exposed:
 
   A simple integer literal showing the total sum of all request
   counter values of all CEX resources managed by all CEX plug-in
-  instances. This metric gives the sum of all
+  instances. This metric provides the sum of all
   `cex_plugin_request_counter` over all crypto configsets and is
   provided only for convenience.
 
