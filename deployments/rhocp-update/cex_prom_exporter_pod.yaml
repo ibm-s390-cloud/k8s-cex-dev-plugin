@@ -19,7 +19,7 @@ spec:
       serviceAccountName: cex-prometheus-exporter-sa
       containers:
         - name: cex-prometheus-exporter
-          image: 'quay.io/ibm/ibm-cex-plugin-cm:v1.2.3'
+          image: 'quay.io/ibm/ibm-cex-plugin-cm:v1.2.4'
           imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false

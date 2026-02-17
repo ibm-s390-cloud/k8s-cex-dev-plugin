@@ -1,5 +1,20 @@
 # Release Notes
 
+<!--- ---------- 1.2.4 ---------- -->
+
+## Version 1.2.4
+
+### Features
+
+Use quay.io/projectquay/golang.1.23 as the build image for the docker builds for
+the cex-device-plugin, cex-prometheus-exporter and the combined image.
+
+### Resolved issues
+
+* Fix crash on empty config set
+* Fix crash caused by rase condition during shutdown of an plugin instance
+* Fix nil pointer dereference in checkChanged
+
 <!--- ---------- 1.2.3 ---------- -->
 
 ## Version 1.2.3
