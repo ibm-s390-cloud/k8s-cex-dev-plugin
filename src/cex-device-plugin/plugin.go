@@ -119,6 +119,18 @@ func (z *ZCryptoDPMLister) NewPlugin(resource string) dpm.PluginInterface {
 
 	ccset, tag := GetCurrentCryptoConfigSet(nil, resource, nil)
 
+	// adjust the ConfigSet to set up defaults
+	if ccset != nil {
+		if ccset.Overcommit < 0 {
+			// no overcommit parameter given in this config set, so use default
+			ccset.Overcommit = apqnOverCommitLimit
+		}
+		if ccset.Livesysfs < 0 {
+			// no livesysfs parameter given in this config set, so use default
+			ccset.Livesysfs = apqnLiveSysfs
+		}
+	}
+
 	p := &ZCryptoResPlugin{
 		lister:   z,
 		resource: resource,
@@ -235,7 +247,7 @@ func (p *ZCryptoResPlugin) checkChanged() bool {
 		p.tellMetricsCollAboutPluginDevs()
 		return true
 	} else {
-		log.Printf("Plugin['%s']: no changes\n", p.resource)
+		log.Printf("Plugin['%s']: no Config or APQN changes detected\n", p.resource)
 		return false
 	}
 }

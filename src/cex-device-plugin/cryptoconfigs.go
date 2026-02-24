@@ -59,15 +59,15 @@ type CryptoConfig struct {
 }
 
 type CryptoConfigSet struct {
-	SetName     string    `json:"setname"`
-	Project     string    `json:"project"`
-	CexMode     string    `json:"cexmode"`
-	MinCexGen   string    `json:"mincexgen"`
-	_overcommit *int      `json:"overcommit,omitempty"` // intermediate field for parsing
-	Overcommit  int       `json:"-"`                    // -1 if not given, otherwise value of *_overcommit
-	_livesysfs  *int      `json:"livesysfs,omitempty"`  // intermediate field for parsing
-	Livesysfs   int       `json:"-"`                    // -1 if not given, otherwise value of *_livesysfs
-	APQNDefs    []APQNDef `json:"apqns"`
+	SetName		string	 `json:"setname"`
+	Project		string	 `json:"project"`
+	CexMode		string	 `json:"cexmode"`
+	MinCexGen	string	 `json:"mincexgen"`
+	Tmp_overcommit *int	 `json:"overcommit"` // intermediate field for parsing, do not use
+	Overcommit	int	 `json:"-"`	     // -1 if not given, otherwise value of *Tmp_overcommit
+	Tmp_livesysfs  *int	 `json:"livesysfs"`  // intermediate field for parsing, do not use
+	Livesysfs	int	 `json:"-"`	     // -1 if not given, otherwise value of *Tmp_livesysfs
+	APQNDefs      []APQNDef	 `json:"apqns"`
 }
 
 type APQNDef struct {
@@ -88,29 +88,6 @@ func (cc CryptoConfig) String() string {
 	}
 	b.WriteString("]")
 	return b.String()
-}
-
-func (cc CryptoConfig) Equal(o *CryptoConfig) bool {
-
-	if len(cc.CryptoConfigSets) != len(o.CryptoConfigSets) {
-		return false
-	}
-	for _, s1 := range cc.CryptoConfigSets {
-		found := false
-		for _, s2 := range o.CryptoConfigSets {
-			if s1.SetName == s2.SetName {
-				if !s1.equal(s2) {
-					return false
-				}
-				found = true
-				break
-			}
-		}
-		if !found {
-			return false
-		}
-	}
-	return true
 }
 
 func (cc CryptoConfig) Verify() bool {
@@ -169,25 +146,25 @@ func (cc CryptoConfig) Verify() bool {
 		}
 		// check optional overcommit limit
 		s.Overcommit = -1 // -1 means no overcommit given, so use the default value
-		if s._overcommit != nil {
+		if s.Tmp_overcommit != nil {
 			// accect values >= 0
-			if *s._overcommit < 0 {
-				log.Printf("%s Unknown/unsupported overcommit value '%d'\n", prestr, *s._overcommit)
+			if *s.Tmp_overcommit < 0 {
+				log.Printf("%s Unknown/unsupported overcommit value '%d'\n", prestr, *s.Tmp_overcommit)
 				return false
 			}
-			s.Overcommit = *s._overcommit
+			s.Overcommit = *s.Tmp_overcommit
 			log.Printf("%s Optional 'overcommit = %d' parameter specified in config set\n",
 				prestr, s.Overcommit)
 		}
 		// check optional livesysfs parameter
 		s.Livesysfs = -1 // -1 means to use the default (see apqnLiveSysfs from plugin.go)
-		if s._livesysfs != nil {
+		if s.Tmp_livesysfs != nil {
 			// accect values >= 0, meaning 0: livesysfs disabled, > 0 livesysfs enabled
-			if *s._livesysfs < 0 {
-				log.Printf("%s Unknown/unsupported livesysfs value '%d'\n", prestr, *s._livesysfs)
+			if *s.Tmp_livesysfs < 0 {
+				log.Printf("%s Unknown/unsupported livesysfs value '%d'\n", prestr, *s.Tmp_livesysfs)
 				return false
 			}
-			s.Livesysfs = *s._livesysfs
+			s.Livesysfs = *s.Tmp_livesysfs
 			log.Printf("%s Optional 'livesysfs = %d' parameter specified in config set\n",
 				prestr, s.Livesysfs)
 		}
