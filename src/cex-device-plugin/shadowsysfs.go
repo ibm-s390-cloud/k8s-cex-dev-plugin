@@ -63,6 +63,7 @@ var sys_devices_ap_card_maybecopyfiles = []string{
 	"serialnr",
 }
 var sys_devices_ap_card_fileswithvalue = []struct{ name, value string }{
+	{"chkstop", "0\n"},
 	{"config", "1\n"},
 	{"load", "0\n"},
 	{"online", "1\n"},
@@ -75,6 +76,7 @@ var sys_devices_ap_card_livesysfs_fileswithvalue = []struct{ name, value string 
 	{"load", "0\n"},
 }
 var sys_devices_ap_card_livesysfs_links_to_queuedir = []string{
+	"chkstop",
 	"config",
 	"online",
 	"pendingq_count",
@@ -92,6 +94,7 @@ var sys_devices_ap_queue_maybecopyfiles = []string{
 	"op_modes",
 }
 var sys_devices_ap_queue_fileswithvalue = []struct{ name, value string }{
+	{"chkstop", "0\n"},
 	{"config", "1\n"},
 	{"load", "0\n"},
 	{"online", "1\n"},
