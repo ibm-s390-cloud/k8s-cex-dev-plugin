@@ -1,5 +1,18 @@
 # Release Notes
 
+<!--- ---------- 1.2.5 ---------- -->
+
+## Version 1.2.5
+
+### Features
+
+Support for the sysfs attributes 'chkstop', 'config' and 'max_msg_size'.
+
+### Resolved issues
+
+* Do not exit if zcrypot multiple node support is not available
+* Fix livesysfs and overcommit config options
+
 <!--- ---------- 1.2.4 ---------- -->
 
 ## Version 1.2.4
