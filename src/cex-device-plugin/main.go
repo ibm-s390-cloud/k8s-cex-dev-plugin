@@ -93,7 +93,7 @@ func main() {
 	log.Printf("Main: Machine id is '%s'\n", MachineId)
 
 	// initial list of the available apqns on this node or die
-	_, err = apScanAPQNs(true)
+	allnodeapqns, err := apScanAPQNs(true)
 	if err != nil {
 		log.Fatalf("Main: Initial scan of the available APQNs on this node failed: %s\n", err)
 	}
@@ -119,7 +119,12 @@ func main() {
 
 	// check for zcrypt multiple node support or die
 	if !zcryptHasNodesSupport() {
-		log.Fatalf("Main: No zcrypt multiple node support available\n")
+		// this is only fatal if there are APQNs available
+		if len(allnodeapqns) > 0 {
+			log.Fatalf("Main: No zcrypt multiple node support available\n")
+		} else {
+			log.Printf("Main: Warning: Zcrypt multiple node support not found.\n")
+		}
 	}
 
 	// start pod lister or die
