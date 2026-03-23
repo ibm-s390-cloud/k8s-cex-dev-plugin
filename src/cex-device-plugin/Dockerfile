@@ -16,7 +16,7 @@
 # Author(s): Harald Freudenberger <freude@de.ibm.com>
 #
 
-ARG BUILD_IMAGE=quay.io/projectquay/golang:1.23
+ARG BUILD_IMAGE=quay.io/projectquay/golang:1.25
 
 FROM ${BUILD_IMAGE} as build
 
