@@ -1,5 +1,15 @@
 # Release Notes
 
+<!--- ---------- 1.2.6 ---------- -->
+
+## Version 1.2.6
+
+### Resolved issues
+
+* Addressed a critical CVE by updating dependencies:
+  * Go runtime upgraded to 1.25
+  * gRPC upgraded to 1.79.3
+
 <!--- ---------- 1.2.5 ---------- -->
 
 ## Version 1.2.5
