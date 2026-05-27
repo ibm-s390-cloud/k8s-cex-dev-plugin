@@ -1,5 +1,17 @@
 # Release Notes
 
+<!--- ---------- 1.2.7 ---------- -->
+
+## Version 1.2.7
+
+### Resolved issues
+
+* Update to address security vulnerabilities
+  CVE-2026-33814 and CVE-2026-39824.
+  * Go upgrade to 1.26
+  * grpc upgrade to v1.80.0
+  * x/sys upgrade to v0.44.0
+
 <!--- ---------- 1.2.6 ---------- -->
 
 ## Version 1.2.6
