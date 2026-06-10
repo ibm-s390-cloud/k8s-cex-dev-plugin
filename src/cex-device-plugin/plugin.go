@@ -121,6 +121,10 @@ func (z *ZCryptoDPMLister) NewPlugin(resource string) dpm.PluginInterface {
 
 	// adjust the ConfigSet to set up defaults
 	if ccset != nil {
+		if ccset.ControlDomain == 0 {
+			// no control_domain parameter given in this config set, so use default
+			ccset.ControlDomain = ControlDomain_UsageOnly
+		}
 		if ccset.Overcommit < 0 {
 			// no overcommit parameter given in this config set, so use default
 			ccset.Overcommit = apqnOverCommitLimit
@@ -215,6 +219,10 @@ func (p *ZCryptoResPlugin) checkChanged() bool {
 
 	// adjust the ConfigSet before comparing
 	if ccset != nil {
+		if ccset.ControlDomain == 0 {
+			// no control_domain parameter given in this config set, so use default
+			ccset.ControlDomain = ControlDomain_UsageOnly
+		}
 		if ccset.Overcommit < 0 {
 			// no overcommit parameter given in this config set, so use default
 			ccset.Overcommit = apqnOverCommitLimit
@@ -223,6 +231,12 @@ func (p *ZCryptoResPlugin) checkChanged() bool {
 			// no livesysfs parameter given in this config set, so use default
 			ccset.Livesysfs = apqnLiveSysfs
 		}
+	}
+
+	// check for control_domain change in ConfigSet
+	if ccset != nil && (p.ccset == nil || ccset.ControlDomain != p.ccset.ControlDomain) {
+		log.Printf("Plugin['%s']: Rescan found changes in ConfigSet: control_domain parameter has changed\n", p.resource)
+		configChanged = true
 	}
 
 	// check for overcommit change in ConfigSet
@@ -380,7 +394,7 @@ func (p *ZCryptoResPlugin) Allocate(ctx context.Context, req *kdp.AllocateReques
 			znode := fmt.Sprintf("zcrypt-"+ApqnFmtStr, card, queue, overcount)
 			if !zcryptNodeExists(znode) {
 				log.Printf("Plugin['%s']: creating zcrypt device node '%s'\n", p.resource, znode)
-				err = zcryptCreateSimpleNode(znode, card, queue)
+				err = zcryptCreateSimpleNode(znode, card, queue, p.ccset.ControlDomain)
 				if err != nil {
 					log.Printf("Plugin['%s']: Error creating zcrypt node '%s': %s\n", p.resource, znode, err)
 					defer zcryptDestroyNode(znode)
@@ -396,7 +410,7 @@ func (p *ZCryptoResPlugin) Allocate(ctx context.Context, req *kdp.AllocateReques
 			dev.Permissions = "rw"
 			carsp.Devices = append(carsp.Devices, dev)
 			// create AP bus and devices shadow sysfs for this container and mount them into the container
-			apbusdir, apdevsdir, err := makeShadowApSysfs(id, p.ccset.Livesysfs, card, queue)
+			apbusdir, apdevsdir, err := makeShadowApSysfs(id, p.ccset.Livesysfs, card, queue, p.ccset.ControlDomain)
 			if err != nil {
 				log.Printf("Plugin['%s']: Error creating shadow sysfs for device '%s': %s\n", p.resource, id, err)
 				defer zcryptDestroyNode(znode)

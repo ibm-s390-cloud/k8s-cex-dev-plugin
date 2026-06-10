@@ -126,7 +126,7 @@ func shadowSysfsInit() bool {
 	return true
 }
 
-func makeShadowApSysfs(id string, livesysfs, adapter, domain int) (string, string, error) {
+func makeShadowApSysfs(id string, livesysfs, adapter, domain int, controlDomain ControlDomainTreating) (string, string, error) {
 
 	exists := func(name string) bool {
 		_, err := os.Stat(name)
@@ -265,7 +265,25 @@ func makeShadowApSysfs(id string, livesysfs, adapter, domain int) (string, strin
 		if err = make256bitmaskfile(shadowapbusdir+"/ap_adapter_mask", 0x00, adapter); err != nil {
 			break
 		}
-		if err = make256bitmaskfile(shadowapbusdir+"/ap_control_domain_mask", 0x00); err != nil {
+		// create control domain mask according to config set
+		log.Printf("Shadowsysfs: creating control domain mask '%d'\n", controlDomain)
+		switch controlDomain {
+		case ControlDomain_UsageAndControl:
+			if err = make256bitmaskfile(shadowapbusdir+"/ap_control_domain_mask", 0x00, domain); err != nil {
+				break
+			}
+		case ControlDomain_All:
+			if err = make256bitmaskfile(shadowapbusdir+"/ap_control_domain_mask", 0xff); err != nil {
+				break
+			}
+		case ControlDomain_UsageOnly:
+			fallthrough
+		default:
+			if err = make256bitmaskfile(shadowapbusdir+"/ap_control_domain_mask", 0x00); err != nil {
+				break
+			}
+		}
+		if err != nil {
 			break
 		}
 		if err = makefile(shadowapbusdir+"/ap_domain", fmt.Sprintf("%d\n", domain)); err != nil {

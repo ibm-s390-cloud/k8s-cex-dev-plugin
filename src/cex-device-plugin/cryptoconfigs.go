@@ -43,6 +43,14 @@ const (
 	configfile = "/config/cex_resources.json"
 )
 
+type ControlDomainTreating int
+
+const (
+	ControlDomain_UsageOnly ControlDomainTreating = iota + 1
+	ControlDomain_UsageAndControl
+	ControlDomain_All
+)
+
 var (
 	mu   sync.RWMutex
 	cc   *CryptoConfig
@@ -59,15 +67,17 @@ type CryptoConfig struct {
 }
 
 type CryptoConfigSet struct {
-	SetName		string	 `json:"setname"`
-	Project		string	 `json:"project"`
-	CexMode		string	 `json:"cexmode"`
-	MinCexGen	string	 `json:"mincexgen"`
-	Tmp_overcommit *int	 `json:"overcommit"` // intermediate field for parsing, do not use
-	Overcommit	int	 `json:"-"`	     // -1 if not given, otherwise value of *Tmp_overcommit
-	Tmp_livesysfs  *int	 `json:"livesysfs"`  // intermediate field for parsing, do not use
-	Livesysfs	int	 `json:"-"`	     // -1 if not given, otherwise value of *Tmp_livesysfs
-	APQNDefs      []APQNDef	 `json:"apqns"`
+	SetName            string                `json:"setname"`
+	Project            string                `json:"project"`
+	CexMode            string                `json:"cexmode"`
+	MinCexGen          string                `json:"mincexgen"`
+	Tmp_control_domain *string               `json:"control_domain"` // intermediate field for parsing, do not use
+	ControlDomain      ControlDomainTreating `json:"-"`              // internal control domain handling
+	Tmp_overcommit     *int                  `json:"overcommit"`     // intermediate field for parsing, do not use
+	Overcommit         int                   `json:"-"`              // -1 if not given, otherwise value of *Tmp_overcommit
+	Tmp_livesysfs      *int                  `json:"livesysfs"`      // intermediate field for parsing, do not use
+	Livesysfs          int                   `json:"-"`              // -1 if not given, otherwise value of *Tmp_livesysfs
+	APQNDefs           []APQNDef             `json:"apqns"`
 }
 
 type APQNDef struct {
@@ -136,6 +146,37 @@ func (cc CryptoConfig) Verify() bool {
 				return false
 			}
 		}
+
+		// check optional control_domain parameter
+		s.ControlDomain = ControlDomain_UsageOnly
+
+		if s.Tmp_control_domain != nil {
+			switch *s.Tmp_control_domain {
+			case "usage-only":
+				s.ControlDomain = ControlDomain_UsageOnly
+			case "usage-and-control":
+				s.ControlDomain = ControlDomain_UsageAndControl
+			case "all-control-domains":
+				s.ControlDomain = ControlDomain_All
+			default:
+				log.Printf("%s Unknown/unsupported control_domain value '%s'\n",
+					prestr, *s.Tmp_control_domain)
+				return false
+			}
+
+			// control domains only apply to CCA and EP11
+			if len(s.CexMode) > 0 &&
+				s.CexMode != "cca" &&
+				s.CexMode != "ep11" {
+				log.Printf("%s control_domain only supported for cexmode 'cca' and 'ep11'\n",
+					prestr)
+				return false
+			}
+
+			log.Printf("%s Optional 'control_domain = %s' parameter specified in config set\n",
+				prestr, *s.Tmp_control_domain)
+		}
+
 		// check mincexgen
 		if len(s.MinCexGen) > 0 {
 			match, _ := regexp.MatchString("^cex[456789]$", s.MinCexGen)
@@ -223,6 +264,7 @@ func (cc CryptoConfig) PrettyLog() {
 		if len(e.MinCexGen) > 0 {
 			log.Printf("    mincexgen: '%s'\n", e.MinCexGen)
 		}
+		log.Printf("    control_domain: '%d'\n", e.ControlDomain)
 		if e.Overcommit >= 0 {
 			log.Printf("    overcommit: %d\n", e.Overcommit)
 		}
@@ -291,8 +333,8 @@ func (cc *CryptoConfig) GetCryptoConfigSetForThisAPQN(ap, dom int, machineid str
 }
 
 func (s CryptoConfigSet) String() string {
-	return fmt.Sprintf("Set(setname=%s,project=%s,cexmode=%s,mincexgen=%s,overcommit=%d,livesysfs=%d,apqndefs=%s)",
-		s.SetName, s.Project, s.CexMode, s.MinCexGen, s.Overcommit, s.Livesysfs, s.APQNDefs)
+	return fmt.Sprintf("Set(setname=%s,project=%s,cexmode=%s,mincexgen=%s,controldomain=%d,overcommit=%d,livesysfs=%d,apqndefs=%s)",
+		s.SetName, s.Project, s.CexMode, s.MinCexGen, s.ControlDomain, s.Overcommit, s.Livesysfs, s.APQNDefs)
 }
 
 func (s CryptoConfigSet) equal(o *CryptoConfigSet) bool {
@@ -301,6 +343,7 @@ func (s CryptoConfigSet) equal(o *CryptoConfigSet) bool {
 		s.Project != o.Project ||
 		s.CexMode != o.CexMode ||
 		s.MinCexGen != o.MinCexGen ||
+		s.ControlDomain != o.ControlDomain ||
 		s.Overcommit != o.Overcommit ||
 		s.Livesysfs != o.Livesysfs ||
 		len(s.APQNDefs) != len(o.APQNDefs) {

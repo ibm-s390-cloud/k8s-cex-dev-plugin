@@ -64,6 +64,8 @@ func getenvint(envvar string, defaultval, minval, maxval int) int {
 
 func Int(v int) *int { return &v }
 
+func String(v string) *string { return &v }
+
 func TestCryptoConfigVerification(t *testing.T) {
 	var tests = []struct {
 		config CryptoConfig
@@ -149,6 +151,85 @@ func TestCryptoConfigVerification(t *testing.T) {
 				},
 			},
 			name: "invalid cex-mode",
+			want: false,
+		},
+		// valid control_domain = usage-only
+		{
+			config: CryptoConfig{
+				CryptoConfigSets: []*CryptoConfigSet{
+					&CryptoConfigSet{
+						SetName:            "set",
+						Project:            "test",
+						CexMode:            "cca",
+						Tmp_control_domain: String("usage-only"),
+					},
+				},
+			},
+			name: "valid control_domain usage-only",
+			want: true,
+		},
+
+		// valid control_domain = usage-and-control
+		{
+			config: CryptoConfig{
+				CryptoConfigSets: []*CryptoConfigSet{
+					&CryptoConfigSet{
+						SetName:            "set",
+						Project:            "test",
+						CexMode:            "cca",
+						Tmp_control_domain: String("usage-and-control"),
+					},
+				},
+			},
+			name: "valid control_domain usage-and-control",
+			want: true,
+		},
+
+		// valid control_domain = all-control-domains
+		{
+			config: CryptoConfig{
+				CryptoConfigSets: []*CryptoConfigSet{
+					&CryptoConfigSet{
+						SetName:            "set",
+						Project:            "test",
+						CexMode:            "ep11",
+						Tmp_control_domain: String("all-control-domains"),
+					},
+				},
+			},
+			name: "valid control_domain all-control-domains",
+			want: true,
+		},
+
+		// invalid control_domain value
+		{
+			config: CryptoConfig{
+				CryptoConfigSets: []*CryptoConfigSet{
+					&CryptoConfigSet{
+						SetName:            "set",
+						Project:            "test",
+						CexMode:            "cca",
+						Tmp_control_domain: String("invalid"),
+					},
+				},
+			},
+			name: "invalid control_domain value",
+			want: false,
+		},
+
+		// control_domain not supported for accel
+		{
+			config: CryptoConfig{
+				CryptoConfigSets: []*CryptoConfigSet{
+					&CryptoConfigSet{
+						SetName:            "set",
+						Project:            "test",
+						CexMode:            "accel",
+						Tmp_control_domain: String("usage-and-control"),
+					},
+				},
+			},
+			name: "control_domain with accel",
 			want: false,
 		},
 		// invalid mincexgen

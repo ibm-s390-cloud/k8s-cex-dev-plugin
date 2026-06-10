@@ -199,6 +199,36 @@ func zcryptAddDomainsToNode(nodename string, domains ...int) error {
 	return nil
 }
 
+func zcryptSetControlDomainMask(nodename string, controlDomain ControlDomainTreating, domain int) error {
+
+	// set control domains by writing to /sys/devices/virtual/zcrypt/<nodename>/admask
+	admaskfname := zcryptvdevdir + "/" + nodename + "/" + "admask"
+	f, err := os.OpenFile(admaskfname, os.O_WRONLY, 0)
+	if err != nil {
+		log.Printf("Zcrypt: Can't open file '%s': %s\n", admaskfname, err)
+		return err
+	}
+	defer f.Close()
+
+	switch controlDomain {
+	case ControlDomain_UsageAndControl:
+		_, err = fmt.Fprintf(f, "+%d\n", domain)
+	case ControlDomain_All:
+		_, err = fmt.Fprintln(f, "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
+	case ControlDomain_UsageOnly:
+		fallthrough
+	default:
+		_, err = fmt.Fprintln(f, "0x0000000000000000000000000000000000000000000000000000000000000000")
+	}
+
+	if err != nil {
+		log.Printf("Zcrypt: Error writing to '%s': %s\n", admaskfname, err)
+		return err
+	}
+
+	return nil
+}
+
 func zcryptAddIoctlsToNode(nodename string, ioctls ...int) error {
 
 	// add ioctls by writing +<ioctl> to /sys/devices/virtual/zcrypt/<nodename>/ioctlmask
@@ -236,7 +266,7 @@ func zcryptAddIoctlsToNode(nodename string, ioctls ...int) error {
 	return nil
 }
 
-func zcryptCreateSimpleNode(nodename string, adapter, domain int) error {
+func zcryptCreateSimpleNode(nodename string, adapter, domain int, controlDomain ControlDomainTreating) error {
 
 	if err := zcryptCreateNode(nodename); err != nil {
 		return fmt.Errorf("Zcrypt: zcryptCreateNode('%s') failed: %w", nodename, err)
@@ -248,6 +278,10 @@ func zcryptCreateSimpleNode(nodename string, adapter, domain int) error {
 
 	if err := zcryptAddDomainsToNode(nodename, domain); err != nil {
 		return fmt.Errorf("Zcrypt: zcryptAddDomainsToNode('%s') failed: %w", nodename, err)
+	}
+
+	if err := zcryptSetControlDomainMask(nodename, controlDomain, domain); err != nil {
+		return fmt.Errorf("Zcrypt: zcryptSetControlDomainMask('%s') failed: %w", nodename, err)
 	}
 
 	if err := zcryptAddIoctlsToNode(nodename); err != nil {
