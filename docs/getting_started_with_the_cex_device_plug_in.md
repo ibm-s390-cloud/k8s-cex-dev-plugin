@@ -37,6 +37,10 @@ format.
 A working sample is provided in the appendix
 [Sample CEX resource configuration map](appendix.md#sample-cex-resource-configuration-map).
 
+Crypto configuration sets can also optionally specify how control domains are made available
+to containers by using the `control_domain` parameter. For details about the supported values
+and their behavior, see [Support for control domains](support_for_control_domains.md).
+
 The following example shows only the head and some possibly *crypto config set*
 definitions:
 
@@ -56,6 +60,7 @@ definitions:
                 "setname":   "CCA_for_customer_1",
                 "project":   "customer-1",
                 "cexmode":   "cca",
+                "control_domain": "usage-and-control",
                 "apqns":
                 [
                     {
@@ -108,6 +113,12 @@ set comprises the following entries:
   specified through the environment variable APQN_OVERCOMMIT_LIMIT. If the
   environment variable is not specified, the default value for overcommit is 1
   (no overcommit).
+- `control_domain`: optional, specifies how control domains are exposed to
+  the container for CCA and EP11 resources. If omitted, the default value is
+  `usage-only`. This parameter is only valid for configuration sets with
+  `cexmode` set to `cca` or `ep11`. For details about the supported values
+  and their behavior, see
+  [Support for control domains](support_for_control_domains.md).
 
 ### APQN parameters
 
