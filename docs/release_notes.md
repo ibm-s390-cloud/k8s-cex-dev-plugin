@@ -1,5 +1,15 @@
 # Release Notes
 
+<!--- ---------- 1.2.8 ---------- -->
+
+## Version 1.2.8
+
+### Resolved issues
+
+* Update to address security vulnerabilities found by the Mend scanner.
+  * golang.org/x/net upgrade to v0.55
+  * google.golang.org/grpc upgrade to v1.82.1
+
 <!--- ---------- 1.2.7 ---------- -->
 
 ## Version 1.2.7
