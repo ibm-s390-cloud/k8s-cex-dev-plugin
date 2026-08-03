@@ -6,7 +6,8 @@
 
 ### Resolved issues
 
-* Update to address security vulnerabilities found by the Mend scanner.
+* Update to address security vulnerabilities found by the Mend scanner:
+  CVE-2026-46600 and CVE-2026-56852. 
   * golang.org/x/net upgrade to v0.55
   * google.golang.org/grpc upgrade to v1.82.1
 
