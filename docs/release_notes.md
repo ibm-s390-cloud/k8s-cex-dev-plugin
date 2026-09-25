@@ -1,5 +1,26 @@
 # Release Notes
 
+<!--- ---------- 1.2.9 ---------- -->
+
+## Version 1.2.9
+
+### Resolved issues
+
+* Update to address security vulnerabilities found by the Mend scanner:
+  - CVE-2026-84445
+  - CVE-2026-84304
+  - CVE-2026-84303
+  - CVE-2026-63209
+  - CVE-2026-78663
+  - CVE-2026-97032
+  - CVE-2026-78669
+  - CVE-2026-78660
+  - CVE-2026-78659
+  - CVE-2026-97045
+  - CVE-2026-78661
+by upgrading google.golang.org/grpc upgrade to v1.85.0 and
+github.com/prometheus/client_golang to v1.24.1.
+
 <!--- ---------- 1.2.8 ---------- -->
 
 ## Version 1.2.8
@@ -7,7 +28,7 @@
 ### Resolved issues
 
 * Update to address security vulnerabilities found by the Mend scanner:
-  CVE-2026-46600 and CVE-2026-56852. 
+  CVE-2026-46600 and CVE-2026-56852.
   * golang.org/x/net upgrade to v0.55
   * google.golang.org/grpc upgrade to v1.82.1
 
