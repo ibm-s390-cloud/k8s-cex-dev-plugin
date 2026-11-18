@@ -4,6 +4,10 @@
 
 ## Version 1.2.9
 
+### Features
+
+* Add support for configuring control domains for APQN resources.
+
 ### Resolved issues
 
 * Update to address security vulnerabilities found by the Mend scanner:
